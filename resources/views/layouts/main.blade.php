@@ -6,15 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $pageTitle ?? 'Личный сайт' }}</title>
     
-    <link rel="stylesheet" href="/resources/css/style.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
     
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     
-    <script src="/resources/js/menu.js"></script>
-    <script src="/resources/js/clock.js"></script>
-    <script src="/resources/js/tracking.js"></script>
-    <script src="/resources/js/popover.js"></script>
-    <script src="/resources/js/modal.js"></script>
+    <script src="/js/menu.js"></script>
+    <script src="/js/clock.js"></script>
+    <script src="/js/tracking.js"></script>
+    <script src="/js/popover.js"></script>
+    <script src="/js/modal.js"></script>
 
     <script>
     const pageName = "{{ $pageName ?? 'unknown' }}";
@@ -61,8 +61,8 @@
         @yield('content')
     </main>
     
-    <script src="/resources/js/photos.js"></script>
-    <script src="/resources/js/contacts.js"></script>
-    <script src="/resources/js/interests.js"></script>
+    <script src="/js/photos.js"></script>
+    <script src="/js/contacts.js"></script>
+    <script src="/js/interests.js"></script>
 </body>
 </html>
