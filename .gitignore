@@ -1,102 +1,88 @@
-```
-# Compiled and build artifacts
-*.pyc
-__pycache__/
-*.o
-*.obj
-*.class
-*.exe
-*.dll
-*.so
-*.a
-*.out
-
 # Dependencies
 vendor/
-node_modules/
-.env
-.env.local
-.env.*
 
 # Logs and temp files
 *.log
 *.tmp
-*.swp
 
-# Editors
+# Environment
+.env
+.env.local
+.env.*
+
+# Editor/IDE
 .vscode/
 .idea/
+*.swp
+*.swo
 
 # OS
 .DS_Store
 Thumbs.db
 
-# Coverage
+# Build artifacts
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.a
+*.out
+dist/
+build/
+target/
 coverage/
 htmlcov/
 .coverage
 
-# Build directories
-dist/
-build/
-target/
-.gradle/
-
-# Python specific
-*.py[cod]
-*$py.class
-*.so
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
 .Python
-env/
-venv/
-.venv/
-pip-log.txt
-pip-delete-this-directory.txt
-.tox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.log
-.git/
+*.egg-info/
+.eggs/
 .mypy_cache/
 .pytest_cache/
-.hypothesis/
+.tox/
 
-# PHP specific
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+.gradle/
+build/
+
+# Ruby
+*.gem
+*.rbc
+.bundle/
+.rbenv-gemsets/
+.rbenv-version/
+.Gemfile.lock
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.prof
+
+# PHP
 *.phar
-.php_cs.cache
-.phpunit.result.cache
-composer.lock
-vendor/
+vendor/composer/installed.json
 
-# Laravel specific
-bootstrap/cache/
-storage/
-public/storage/
-
-# Database
-*.db
-*.sqlite
-*.sqlite3
-
-# Backup files
-*~
-*.bak
-*.swp
-*.swo
-
-# IDE
-.settings/
-.project
-*.tmproj
-nbproject/
-*.sublime-project
-*.sublime-workspace
-
-# Archives
+# Compression
 *.zip
 *.gz
 *.tar
@@ -119,4 +105,11 @@ nbproject/
 *.tar.bz2
 *.tar.xz
 *.tar.zst
-```
+
+# Images (if generated)
+*.png
+*.jpg
+*.jpeg
+*.bmp
+*.gif
+*.webm
