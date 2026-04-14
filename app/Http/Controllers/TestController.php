@@ -19,13 +19,13 @@ class TestController extends Controller
 
             $validator = Validator::make($request->all(), [
                 'fio' => 'required|string|max:255',
-                'group' => 'required|string',
+                'user_group' => 'required|string',
                 'q1' => 'required|string|min:10',
                 'q2' => 'required|in:А,Б,В',
                 'q3' => 'required|in:phys_chem,soc_econ',
             ], [
                 'fio.required' => 'Введите ФИО.',
-                'group.required' => 'Выберите группу.',
+                'user_group.required' => 'Выберите группу.',
                 'q1.required' => 'Ответьте на первый вопрос.',
                 'q1.min' => 'Ответ должен содержать не менее 10 символов.',
                 'q2.required' => 'Выберите ответ на второй вопрос.',
@@ -58,7 +58,7 @@ class TestController extends Controller
                 // Сохраняем результат в БД
                 $testResult = new TestResult();
                 $testResult->fio = $request->input('fio');
-                $testResult->group = $request->input('group');
+                $testResult->user_group = $request->input('user_group');
                 $testResult->q1 = $request->input('q1');
                 $testResult->q2 = $request->input('q2');
                 $testResult->q3 = $request->input('q3');

@@ -18,7 +18,7 @@ class TestResult extends BaseActiveRecord
      * 
      * @var int|null $id ID записи
      * @var string $fio ФИО студента
-     * @var string $group Учебная группа
+     * @var string $user_group Учебная группа
      * @var string $q1 Ответ на вопрос 1
      * @var string $q2 Ответ на вопрос 2
      * @var string $q3 Ответ на вопрос 3
