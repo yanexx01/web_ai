@@ -22,11 +22,11 @@
 
         <div class="form-group">
             <label>Группа:</label>
-            <select name="group">
+            <select name="user_group">
                 <option value="">Выберите группу</option>
-                <option value="ИИ/б-25-1-о" {{ (isset($oldInput['group']) && $oldInput['group'] == 'ИИ/б-25-1-о') ? 'selected' : '' }}>ИИ/б-25-1-о</option>
-                <option value="ИИ/б-25-2-о" {{ (isset($oldInput['group']) && $oldInput['group'] == 'ИИ/б-25-2-о') ? 'selected' : '' }}>ИИ/б-25-2-о</option>
-                <option value="ПИ/б-23-1-о" {{ (isset($oldInput['group']) && $oldInput['group'] == 'ПИ/б-23-1-о') ? 'selected' : '' }}>ПИ/б-23-1-о</option>
+                <option value="ИИ/б-25-1-о" {{ (isset($oldInput['user_group']) && $oldInput['user_group'] == 'ИИ/б-25-1-о') ? 'selected' : '' }}>ИИ/б-25-1-о</option>
+                <option value="ИИ/б-25-2-о" {{ (isset($oldInput['user_group']) && $oldInput['user_group'] == 'ИИ/б-25-2-о') ? 'selected' : '' }}>ИИ/б-25-2-о</option>
+                <option value="ПИ/б-23-1-о" {{ (isset($oldInput['user_group']) && $oldInput['user_group'] == 'ПИ/б-23-1-о') ? 'selected' : '' }}>ПИ/б-23-1-о</option>
                 
             </select>
         </div>
@@ -80,7 +80,7 @@
             <tr>
                 <td>{{ $result->created_at ?? '-' }}</td>
                 <td>{{ $result->fio ?? '-' }}</td>
-                <td>{{ $result->group ?? '-' }}</td>
+                <td>{{ $result->user_group ?? '-' }}</td>
                 <td>
                     <small>
                         Q1: {{ mb_substr($result->q1 ?? '', 0, 30) }}{{ mb_strlen($result->q1 ?? '') > 30 ? '...' : '' }}<br>

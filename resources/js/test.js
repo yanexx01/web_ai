@@ -70,7 +70,7 @@ $(function() {
 
     $form.on('submit', function(e) {
         const $fullName = $('#fullName');
-        const $group = $('#group');
+        const $group = $('[name="user_group"]');
         const $q1 = $('#q1');
         const $q2Radios = $('input[name="Вопрос_2"]');
         const $q3 = $('#q3');
