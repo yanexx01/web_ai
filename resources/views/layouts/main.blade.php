@@ -47,6 +47,7 @@
                 <li><a href="/study" class="menu-item" data-page="study">Учеба</a></li>
                 <li><a href="/photos" class="menu-item" data-page="photos">Фотоальбом</a></li>
                 <li><a href="/history" class="menu-item" data-page="history">История просмотра</a></li>
+                <li><a href="/guestbook" class="menu-item" data-page="guestbook">Гостевая книга</a></li>
                 <li><a href="/contacts" class="menu-item" data-page="contacts">Обратная связь</a></li>
                 <li><a href="/test" class="menu-item" data-page="test">Тест</a></li>
             </ul>
