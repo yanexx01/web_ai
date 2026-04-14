@@ -23,3 +23,5 @@ Route::match(['get', 'post'], '/test', [TestController::class, 'index'])->name('
 // Гостевая книга
 Route::get('/guestbook', [GuestbookController::class, 'index'])->name('guestbook.index');
 Route::post('/guestbook', [GuestbookController::class, 'store'])->name('guestbook.store');
+Route::get('/guestbook/upload', [GuestbookController::class, 'uploadForm'])->name('guestbook.upload.form');
+Route::post('/guestbook/upload', [GuestbookController::class, 'upload'])->name('guestbook.upload');

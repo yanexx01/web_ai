@@ -59,5 +59,47 @@
             <input type="submit" value="Завершить тест" class="btn-submit">
         </div>
     </form>
+
+    {{-- Таблица сохраненных результатов тестов --}}
+    @if(!empty($results))
+    <hr style="margin: 40px 0;">
+    <h2>Сохраненные результаты тестов</h2>
+    <table border="1" cellpadding="10" cellspacing="0" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+        <thead>
+            <tr style="background-color: #f8f9fa;">
+                <th>Дата</th>
+                <th>ФИО</th>
+                <th>Группа</th>
+                <th>Ответы</th>
+                <th>Счет</th>
+                <th>Результат</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($results as $result)
+            <tr>
+                <td>{{ $result->created_at ?? '-' }}</td>
+                <td>{{ $result->fio ?? '-' }}</td>
+                <td>{{ $result->group ?? '-' }}</td>
+                <td>
+                    <small>
+                        Q1: {{ mb_substr($result->q1 ?? '', 0, 30) }}{{ mb_strlen($result->q1 ?? '') > 30 ? '...' : '' }}<br>
+                        Q2: {{ $result->q2 ?? '-' }}<br>
+                        Q3: {{ $result->q3 ?? '-' }}
+                    </small>
+                </td>
+                <td>{{ $result->score ?? 0 }}/3</td>
+                <td>
+                    @if($result->is_correct === 'passed')
+                        <span style="color: green; font-weight: bold;">Верно</span>
+                    @else
+                        <span style="color: red; font-weight: bold;">Неверно</span>
+                    @endif
+                </td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+    @endif
 </div>
 @endsection

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\models\TestResult;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -51,9 +52,25 @@ class TestController extends Controller
                 }
 
                 $total = 3;
+                $isCorrect = ($score >= 2) ? 'passed' : 'failed';
+                $isCorrectText = ($score >= 2) ? 'Верно' : 'Неверно';
+
+                // Сохраняем результат в БД
+                $testResult = new TestResult();
+                $testResult->fio = $request->input('fio');
+                $testResult->group = $request->input('group');
+                $testResult->q1 = $request->input('q1');
+                $testResult->q2 = $request->input('q2');
+                $testResult->q3 = $request->input('q3');
+                $testResult->score = $score;
+                $testResult->is_correct = $isCorrect;
+                $testResult->created_at = date('Y-m-d H:i:s');
+                $testResult->save();
+
                 $resultHtml = "<div class='alert alert-success'>
                     <h3>Результат теста</h3>
                     <p>Ваш счет: <strong>{$score}</strong> из {$total}</p>
+                    <p>Результат: <strong>{$isCorrectText}</strong></p>
                 </div>";
 
                 $oldInput = [];
@@ -68,11 +85,22 @@ class TestController extends Controller
             }
         }
 
+        // Получаем все результаты тестов из БД
+        $results = TestResult::findAll();
+        
+        // Сортируем по убыванию даты
+        usort($results, function($a, $b) {
+            $dateA = strtotime($a->created_at ?? '0000-00-00 00:00:00');
+            $dateB = strtotime($b->created_at ?? '0000-00-00 00:00:00');
+            return $dateB - $dateA;
+        });
+
         return view('test.index', [
             'title' => 'Тест по БЖД',
             'errorsHtml' => $errorsHtml,
             'resultHtml' => $resultHtml,
-            'oldInput' => $oldInput
+            'oldInput' => $oldInput,
+            'results' => $results
         ]);
     }
 }
