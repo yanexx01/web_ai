@@ -11,7 +11,12 @@ class GuestbookController extends Controller
     /**
      * Путь к файлу для хранения сообщений (messages.inc)
      */
-    private const MESSAGES_FILE = storage_path('app/messages.inc');
+    private string $messagesFile;
+
+    public function __construct()
+    {
+        $this->messagesFile = storage_path('app/messages.inc');
+    }
 
     /**
      * Отображение страницы гостевой книги
@@ -81,6 +86,6 @@ class GuestbookController extends Controller
         $date = date('d.m.y');
         $line = "{$date};{$fio};{$guestbook->email};{$guestbook->message}\n";
 
-        file_put_contents(self::MESSAGES_FILE, $line, FILE_APPEND | LOCK_EX);
+        file_put_contents($this->messagesFile, $line, FILE_APPEND | LOCK_EX);
     }
 }
