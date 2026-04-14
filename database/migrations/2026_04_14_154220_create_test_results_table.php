@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('test_results', function (Blueprint $table) {
             $table->id();
             $table->string('fio'); // ФИО студента
-            $table->string('group'); // Учебная группа
+            $table->string('user_group'); // Учебная группа
             $table->text('q1'); // Ответ на вопрос 1
             $table->string('q2'); // Ответ на вопрос 2
             $table->string('q3'); // Ответ на вопрос 3

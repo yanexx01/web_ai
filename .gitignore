@@ -4,6 +4,8 @@
 __pycache__/
 *.o
 *.obj
+dist/
+build/
 *.class
 *.exe
 *.dll
@@ -12,8 +14,9 @@ __pycache__/
 *.out
 
 # Dependencies
-vendor/
 node_modules/
+vendor/
+composer.lock
 .env
 .env.local
 .env.*
@@ -27,15 +30,24 @@ node_modules/
 # Editors
 .vscode/
 .idea/
+*.swp
+*.swo
 
-# Coverage
-.coverage
+# Coverage reports
 coverage/
 htmlcov/
+.coverage
 
-# OS
+# OS generated files
 .DS_Store
 Thumbs.db
+
+# Cache directories
+.cache/
+.mypy_cache/
+.pytest_cache/
+target/
+.gradle/
 
 # Compressed files
 *.zip
@@ -56,8 +68,4 @@ Thumbs.db
 *.Z
 *.lz
 *.lzo
-*.tar.gz
-*.tar.bz2
-*.tar.xz
-*.tar.zst
 ```
