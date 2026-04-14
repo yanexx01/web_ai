@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TestController;
+use App\Http\Controllers\GuestbookController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,3 +19,7 @@ Route::get('/photos', [HomeController::class, 'photos'])->name('photos');
 Route::get('/history', [HomeController::class, 'history'])->name('history');
 Route::match(['get', 'post'], '/contacts', [HomeController::class, 'contacts'])->name('contacts');
 Route::match(['get', 'post'], '/test', [TestController::class, 'index'])->name('test');
+
+// Гостевая книга
+Route::get('/guestbook', [GuestbookController::class, 'index'])->name('guestbook.index');
+Route::post('/guestbook', [GuestbookController::class, 'store'])->name('guestbook.store');
