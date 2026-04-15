@@ -32,3 +32,7 @@ Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::post('/blog', [BlogController::class, 'store'])->name('blog.store');
 Route::get('/blog/create', [BlogController::class, 'create'])->name('blog.create');
 Route::post('/blog/store', [BlogController::class, 'store'])->name('blog.store.action');
+
+// Загрузка CSV в блог
+Route::get('/blog/upload', [BlogController::class, 'showUploadForm'])->name('blog.upload.form');
+Route::post('/blog/upload', [BlogController::class, 'uploadCsv'])->name('blog.upload');
