@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('content')
-<div class="container mt-4">
+<div class="upload-page">
     <h1>{{ $pageTitle }}</h1>
 
     @if (session('success'))
@@ -57,12 +57,10 @@
                     @enderror
                 </div>
 
-                <button type="submit" class="btn btn-primary">
-                    Загрузить записи
-                </button>
-                <a href="{{ route('blog.index') }}" class="btn btn-secondary">
-                    Назад к блогу
-                </a>
+                <div class="button-group">
+                    <button type="submit" class="btn-submit">Загрузить записи</button>
+                    <a href="{{ route('blog.index') }}" class="btn-back">Назад к блогу</a>
+                </div>
             </form>
         </div>
     </div>
