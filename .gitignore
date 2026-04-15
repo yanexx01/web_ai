@@ -1,4 +1,3 @@
-```
 # Compiled and build artifacts
 *.pyc
 __pycache__/
@@ -37,6 +36,8 @@ vendor/
 # Editors
 .vscode/
 .idea/
+*.swp
+*.swo
 
 # System files
 .DS_Store
@@ -70,4 +71,3 @@ htmlcov/
 *.tar.bz2
 *.tar.xz
 *.tar.zst
-```
