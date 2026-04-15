@@ -868,11 +868,11 @@ body {
 .blog-page,
 .upload-page {
     max-width: 1200px;
-    margin: 80px auto 40px;
+    margin: 100px auto 40px;
     padding: 40px;
     background: white;
     border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
 }
 
 .guestbook-page h1,
@@ -880,145 +880,175 @@ body {
 .upload-page h1 {
     text-align: center;
     color: #222;
-    margin-bottom: 30px;
-    font-size: 2rem;
+    margin-bottom: 35px;
+    font-size: 2.2rem;
+    font-weight: bold;
+    position: relative;
+    padding-bottom: 15px;
+}
+
+.guestbook-page h1::after,
+.blog-page h1::after,
+.upload-page h1::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(90deg, #007bff, #0056b3);
+    border-radius: 2px;
 }
 
 /* Формы на страницах guestbook и blog */
 .guestbook-form,
 .blog-form,
 .upload-form {
-    margin-bottom: 30px;
-    padding: 25px;
-    background: #f9f9f9;
-    border-radius: 8px;
+    margin-bottom: 35px;
+    padding: 30px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-radius: 10px;
     border: 1px solid #eaeaea;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
 .guestbook-form h2,
-.blog-form h2 {
+.blog-form h2,
+.upload-form h2 {
     margin-top: 0;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     color: #333;
-    font-size: 1.4rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    padding-left: 15px;
+    border-left: 4px solid #007bff;
 }
 
 /* Группы полей форм */
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 22px;
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 8px;
-    font-weight: bold;
+    margin-bottom: 10px;
+    font-weight: 600;
     color: #333;
-    font-size: 0.95rem;
+    font-size: 1rem;
 }
 
 .form-group input[type="text"],
 .form-group input[type="email"],
 .form-group input[type="file"],
 .form-group textarea,
-.form-group select {
+.form-group select,
+.form-control {
     width: 100%;
-    padding: 12px;
-    border: 2px solid #ddd;
-    border-radius: 6px;
+    padding: 14px 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
     font-size: 1rem;
     font-family: inherit;
-    transition: border-color 0.3s, box-shadow 0.3s;
+    transition: all 0.3s ease;
     box-sizing: border-box;
+    background: #fff;
 }
 
 .form-group input[type="text"]:focus,
 .form-group input[type="email"]:focus,
 .form-group textarea:focus,
-.form-group select:focus {
+.form-group select:focus,
+.form-control:focus {
     outline: none;
     border-color: #007bff;
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.12);
 }
 
 .form-group textarea {
     resize: vertical;
-    min-height: 120px;
+    min-height: 130px;
 }
 
 .form-group input[type="file"] {
-    padding: 10px 0;
-    border: 2px dashed #ddd;
+    padding: 12px 0;
+    border: 2px dashed #d0d0d0;
     background: white;
+    cursor: pointer;
 }
 
 .form-group input[type="file"]:hover {
     border-color: #007bff;
-    background: #f8fbff;
+    background: #f0f7ff;
 }
 
 .form-group .form-text {
-    font-size: 0.85rem;
-    color: #666;
-    margin-top: 8px;
-    line-height: 1.5;
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-top: 10px;
+    line-height: 1.6;
+    font-style: italic;
 }
 
 /* Кнопки отправки форм */
 button[type="submit"],
 .btn-submit,
 .btn-primary {
-    padding: 12px 30px;
-    background: #007bff;
+    padding: 14px 35px;
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
     color: white;
     border: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: bold;
+    border-radius: 8px;
+    font-size: 1.05rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+    transition: all 0.3s ease;
     text-decoration: none;
     display: inline-block;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
 }
 
 button[type="submit"]:hover,
 .btn-submit:hover,
 .btn-primary:hover {
-    background: #0056b3;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    background: linear-gradient(135deg, #0056b3 0%, #004094 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 123, 255, 0.4);
 }
 
 /* Кнопки отмены и назад */
 .btn-cancel,
 .btn-back,
 .btn-secondary {
-    padding: 12px 30px;
-    background: #6c757d;
+    padding: 14px 35px;
+    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
     color: white;
     text-decoration: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: bold;
-    transition: background 0.3s, transform 0.2s;
+    border-radius: 8px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
     display: inline-block;
     border: none;
     cursor: pointer;
+    box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
 }
 
 .btn-cancel:hover,
 .btn-back:hover,
 .btn-secondary:hover {
-    background: #545b62;
-    transform: translateY(-2px);
+    background: linear-gradient(135deg, #545b62 0%, #3e4446 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(108, 117, 125, 0.4);
 }
 
 /* Группа кнопок */
 .button-group,
 .form-actions {
     display: flex;
-    gap: 15px;
+    gap: 18px;
     justify-content: center;
-    margin-top: 25px;
+    margin-top: 30px;
     flex-wrap: wrap;
 }
 
@@ -1026,86 +1056,90 @@ button[type="submit"]:hover,
 .error-messages,
 .alert-error,
 .alert-danger {
-    margin-top: 15px;
-    padding: 15px;
-    background: #f8d7da;
+    margin-top: 20px;
+    padding: 18px 20px;
+    background: linear-gradient(135deg, #f8d7da 0%, #fff5f6 100%);
     border: 1px solid #f5c6cb;
-    border-radius: 6px;
+    border-radius: 8px;
     color: #721c24;
+    box-shadow: 0 2px 8px rgba(114, 28, 36, 0.1);
 }
 
 .error-messages ul,
 .alert-error ul,
 .alert-danger ul {
     margin: 0;
-    padding-left: 20px;
+    padding-left: 22px;
 }
 
 .error-messages li,
 .alert-error li,
 .alert-danger li {
-    margin-bottom: 5px;
+    margin-bottom: 6px;
 }
 
 /* Сообщения об успехе */
 .alert-success {
-    padding: 15px;
-    background: #d4edda;
+    padding: 18px 20px;
+    background: linear-gradient(135deg, #d4edda 0%, #f0fff4 100%);
     border: 1px solid #c3e6cb;
-    border-radius: 6px;
+    border-radius: 8px;
     color: #155724;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 8px rgba(21, 87, 36, 0.1);
 }
 
 /* Предупреждения */
 .alert-warning {
-    padding: 15px;
-    background: #fff3cd;
+    padding: 18px 20px;
+    background: linear-gradient(135deg, #fff3cd 0%, #fffbf0 100%);
     border: 1px solid #ffeeba;
-    border-radius: 6px;
+    border-radius: 8px;
     color: #856404;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 8px rgba(133, 100, 4, 0.1);
 }
 
 .alert-warning h5 {
     margin-top: 0;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
+    font-weight: 600;
 }
 
 .alert-warning ul {
     margin: 0;
-    padding-left: 20px;
+    padding-left: 22px;
 }
 
 /* Таблица гостевой книги */
 .guestbook-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
+    margin-top: 25px;
     background: white;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    border-radius: 8px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
     overflow: hidden;
 }
 
 .guestbook-table th,
 .guestbook-table td {
-    padding: 14px;
+    padding: 16px;
     text-align: left;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #e9ecef;
 }
 
 .guestbook-table th {
-    background: #333;
+    background: linear-gradient(135deg, #333 0%, #4a4a4a 100%);
     color: white;
-    font-weight: bold;
+    font-weight: 600;
     text-transform: uppercase;
     font-size: 0.9rem;
     letter-spacing: 0.5px;
 }
 
 .guestbook-table tr:hover {
-    background: #f8f9fa;
+    background: linear-gradient(90deg, #f8f9fa 0%, #ffffff 100%);
 }
 
 .guestbook-table tr:last-child td {
@@ -1113,233 +1147,259 @@ button[type="submit"]:hover,
 }
 
 .guestbook-table tbody tr:nth-child(even) {
-    background-color: #fafafa;
+    background-color: #fafbfc;
 }
 
 /* Секция сообщений гостевой книги */
 .guestbook-messages {
-    margin-top: 40px;
+    margin-top: 45px;
 }
 
 .guestbook-messages h2 {
     color: #333;
-    margin-bottom: 20px;
-    font-size: 1.4rem;
+    margin-bottom: 25px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    padding-left: 15px;
+    border-left: 4px solid #007bff;
 }
 
 /* Список постов блога */
 .blog-list {
-    margin-top: 30px;
+    margin-top: 35px;
 }
 
 .blog-posts {
     display: flex;
     flex-direction: column;
-    gap: 25px;
+    gap: 30px;
 }
 
 .blog-post {
     background: white;
-    border: 1px solid #eaeaea;
-    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
     overflow: hidden;
-    transition: box-shadow 0.3s, transform 0.3s;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .blog-post:hover {
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    transform: translateY(-4px);
+    border-color: #dee2e6;
 }
 
 .blog-image {
     width: 100%;
     max-height: 400px;
     overflow: hidden;
-    background: #f5f5f5;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
 }
 
 .blog-image img {
     width: 100%;
     height: auto;
     object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.blog-post:hover .blog-image img {
+    transform: scale(1.03);
 }
 
 .blog-content {
-    padding: 25px;
+    padding: 28px;
 }
 
 .blog-topic {
-    margin: 0 0 12px 0;
+    margin: 0 0 14px 0;
     color: #222;
-    font-size: 1.3rem;
+    font-size: 1.4rem;
+    font-weight: bold;
 }
 
 .blog-date {
-    color: #666;
+    color: #6c757d;
     font-size: 0.9rem;
-    margin: 0 0 15px 0;
+    margin: 0 0 18px 0;
+    font-style: italic;
 }
 
 .blog-message {
-    color: #444;
-    line-height: 1.7;
+    color: #495057;
+    line-height: 1.8;
     margin: 0;
+    font-size: 1rem;
 }
 
 /* Пагинация */
 .pagination {
-    margin-top: 30px;
+    margin-top: 35px;
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     flex-wrap: wrap;
 }
 
 .pagination-label {
-    font-weight: bold;
-    margin-right: 10px;
+    font-weight: 600;
+    margin-right: 12px;
     color: #333;
+    font-size: 1rem;
 }
 
 .pagination-link {
-    padding: 10px 16px;
-    background: #007bff;
+    padding: 12px 18px;
+    background: linear-gradient(135deg, #007bff 0%, #0069d9 100%);
     color: white;
     text-decoration: none;
-    border-radius: 6px;
-    transition: background 0.3s, transform 0.2s;
+    border-radius: 8px;
+    transition: all 0.3s ease;
     font-weight: 500;
+    box-shadow: 0 2px 6px rgba(0, 123, 255, 0.25);
 }
 
 .pagination-link:hover {
-    background: #0056b3;
+    background: linear-gradient(135deg, #0056b3 0%, #004094 100%);
     transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.35);
 }
 
 .pagination-link.active {
-    background: #0056b3;
-    font-weight: bold;
+    background: linear-gradient(135deg, #0056b3 0%, #004094 100%);
+    font-weight: 600;
     cursor: default;
+    box-shadow: 0 2px 6px rgba(0, 86, 179, 0.3);
 }
 
 .pagination-ellipsis {
     padding: 8px;
-    color: #666;
+    color: #6c757d;
+    font-weight: bold;
 }
 
 /* Информация о количестве записей */
 .blog-info {
-    margin-top: 20px;
+    margin-top: 25px;
     text-align: center;
-    color: #666;
+    color: #6c757d;
     font-size: 0.95rem;
+    font-style: italic;
 }
 
 /* Кнопки добавления записи и загрузки */
 .add-post-link {
-    margin-top: 30px;
+    margin-top: 35px;
     text-align: center;
     display: flex;
     justify-content: center;
-    gap: 15px;
+    gap: 18px;
     flex-wrap: wrap;
 }
 
 .btn-add-post {
-    padding: 14px 35px;
-    background: #28a745;
+    padding: 16px 40px;
+    background: linear-gradient(135deg, #28a745 0%, #218838 100%);
     color: white;
     text-decoration: none;
-    border-radius: 6px;
+    border-radius: 8px;
     font-size: 1.05rem;
-    font-weight: bold;
-    transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+    font-weight: 600;
+    transition: all 0.3s ease;
     display: inline-block;
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
 }
 
 .btn-add-post:hover {
-    background: #218838;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(40, 167, 69, 0.4);
 }
 
 .btn-upload-csv {
-    padding: 14px 35px;
-    background: #17a2b8;
+    padding: 16px 40px;
+    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
     color: white;
     text-decoration: none;
-    border-radius: 6px;
+    border-radius: 8px;
     font-size: 1.05rem;
-    font-weight: bold;
-    transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+    font-weight: 600;
+    transition: all 0.3s ease;
     display: inline-block;
+    box-shadow: 0 2px 8px rgba(23, 162, 184, 0.3);
 }
 
 .btn-upload-csv:hover {
-    background: #138496;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(23, 162, 184, 0.3);
+    background: linear-gradient(135deg, #138496 0%, #117a8b 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(23, 162, 184, 0.4);
 }
 
 /* Карточка для upload страниц */
 .card {
     background: white;
-    border: 1px solid #eaeaea;
-    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
     overflow: hidden;
-    margin-top: 20px;
+    margin-top: 25px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
 }
 
 .card-header {
-    background: #f8f9fa;
-    padding: 15px 20px;
-    border-bottom: 1px solid #eaeaea;
-    font-weight: bold;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 18px 25px;
+    border-bottom: 1px solid #dee2e6;
+    font-weight: 600;
     color: #333;
+    font-size: 1.1rem;
 }
 
 .card-body {
-    padding: 25px;
+    padding: 30px;
 }
 
 /* Предпросмотр изображения */
 .image-preview {
-    margin-top: 15px;
+    margin-top: 20px;
 }
 
 .preview-img {
     max-width: 100%;
     max-height: 300px;
-    border-radius: 6px;
-    border: 1px solid #ddd;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
 }
 
 /* Пример кода/текста */
 pre.bg-light {
     background: #f8f9fa !important;
-    padding: 20px;
-    border-radius: 6px;
-    border: 1px solid #eaeaea;
+    padding: 25px;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
     overflow-x: auto;
     font-size: 0.9rem;
     color: #333;
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
 code {
     background: #f8f9fa;
-    padding: 2px 6px;
-    border-radius: 4px;
+    padding: 3px 8px;
+    border-radius: 5px;
     font-family: 'Courier New', Courier, monospace;
     font-size: 0.9em;
     color: #e83e8c;
+    border: 1px solid #e9ecef;
 }
 
 pre code {
     background: transparent;
     padding: 0;
     color: inherit;
+    border: none;
 }
 
 /* Текст-заглушка когда нет данных */
@@ -1352,15 +1412,15 @@ pre code {
 }
 
 .mb-3 {
-    margin-bottom: 20px !important;
+    margin-bottom: 25px !important;
 }
 
 .mt-4 {
-    margin-top: 25px !important;
+    margin-top: 30px !important;
 }
 
 .p-3 {
-    padding: 20px !important;
+    padding: 25px !important;
 }
 
 .border {
@@ -1368,19 +1428,45 @@ pre code {
 }
 
 .rounded {
-    border-radius: 6px !important;
+    border-radius: 8px !important;
 }
 
 .is-invalid {
     border-color: #dc3545 !important;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.15) !important;
 }
 
 .invalid-feedback {
     display: block;
     width: 100%;
-    margin-top: 5px;
-    font-size: 0.85rem;
+    margin-top: 8px;
+    font-size: 0.875rem;
     color: #dc3545;
+    font-weight: 500;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #333;
+    font-size: 1rem;
+}
+
+/* Дополнительные стили для upload страниц */
+.upload-page h5 {
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+}
+
+/* Стили для заголовков секций на upload странице */
+.upload-page .text-muted {
+    font-style: italic;
+    padding-left: 15px;
+    border-left: 3px solid #007bff;
+    margin-bottom: 20px;
 }
 
 
