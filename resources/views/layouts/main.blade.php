@@ -29,14 +29,24 @@
 
 <body>
     <header id="top">
-        <nav class="main-menu">
-            <ul>
-                <li><a href="/" class="menu-item" data-page="home">Главная</a></li>
-                <li><a href="/about" class="menu-item" data-page="about">Обо мне</a></li>
+        <button class="menu-toggle" id="menuToggle" aria-label="Открыть меню">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        
+        <nav class="sidebar-menu" id="sidebarMenu">
+            <div class="sidebar-header">
+                <h2>Меню</h2>
+                <button class="sidebar-close" id="sidebarClose" aria-label="Закрыть меню">&times;</button>
+            </div>
+            <ul class="sidebar-list">
+                <li><a href="/" class="sidebar-item" data-page="home">Главная</a></li>
+                <li><a href="/about" class="sidebar-item" data-page="about">Обо мне</a></li>
                 
-                <li class="dropdown">
-                    <a href="/interests" class="menu-item" data-page="interests">Мои интересы</a>
-                    <ul class="dropdown-menu">
+                <li class="sidebar-dropdown">
+                    <a href="/interests" class="sidebar-item" data-page="interests">Мои интересы <span class="dropdown-arrow">▼</span></a>
+                    <ul class="sidebar-dropdown-menu">
                         <li><a href="/interests#hobby" class="dropdown-link">Хобби</a></li>
                         <li><a href="/interests#books" class="dropdown-link">Книги</a></li>
                         <li><a href="/interests#music" class="dropdown-link">Музыка</a></li>
@@ -44,18 +54,20 @@
                     </ul>
                 </li>
 
-                <li><a href="/study" class="menu-item" data-page="study">Учеба</a></li>
-                <li><a href="/photos" class="menu-item" data-page="photos">Фотоальбом</a></li>
-                <li><a href="/history" class="menu-item" data-page="history">История просмотра</a></li>
-                <li><a href="/guestbook" class="menu-item" data-page="guestbook">Гостевая книга</a></li>
-                <li><a href="/contacts" class="menu-item" data-page="contacts">Обратная связь</a></li>
-                <li><a href="/test" class="menu-item" data-page="test">Тест</a></li>
+                <li><a href="/study" class="sidebar-item" data-page="study">Учеба</a></li>
+                <li><a href="/photos" class="sidebar-item" data-page="photos">Фотоальбом</a></li>
+                <li><a href="/history" class="sidebar-item" data-page="history">История просмотра</a></li>
+                <li><a href="/guestbook" class="sidebar-item" data-page="guestbook">Гостевая книга</a></li>
+                <li><a href="/contacts" class="sidebar-item" data-page="contacts">Обратная связь</a></li>
+                <li><a href="/test" class="sidebar-item" data-page="test">Тест</a></li>
             </ul>
             
-            <div id="clock" class="clock-display">
+            <div id="clock" class="clock-display-sidebar">
                 <p>Загрузка...</p>
             </div>
         </nav>
+        
+        <div class="menu-overlay" id="menuOverlay"></div>
     </header>
 
     <main>
