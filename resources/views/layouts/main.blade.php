@@ -28,8 +28,21 @@
 </head>
 
 <body>
-    <header id="top">
-        <nav class="main-menu">
+    <!-- Кнопка открытия бокового меню -->
+    <button class="menu-toggle" id="menuToggle" aria-label="Открыть меню">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <!-- Боковое меню -->
+    <aside class="sidebar-menu" id="sidebarMenu">
+        <div class="sidebar-header">
+            <h2>Меню</h2>
+            <button class="sidebar-close" id="sidebarClose" aria-label="Закрыть меню">&times;</button>
+        </div>
+        
+        <nav class="sidebar-nav">
             <ul>
                 <li><a href="/" class="menu-item" data-page="home">Главная</a></li>
                 <li><a href="/about" class="menu-item" data-page="about">Обо мне</a></li>
@@ -50,13 +63,17 @@
                 <li><a href="/guestbook" class="menu-item" data-page="guestbook">Гостевая книга</a></li>
                 <li><a href="/contacts" class="menu-item" data-page="contacts">Обратная связь</a></li>
                 <li><a href="/test" class="menu-item" data-page="test">Тест</a></li>
+                <li><a href="/blog" class="menu-item" data-page="blog">Блог</a></li>
             </ul>
-            
-            <div id="clock" class="clock-display">
-                <p>Загрузка...</p>
-            </div>
         </nav>
-    </header>
+        
+        <div id="clock" class="clock-display">
+            <p>Загрузка...</p>
+        </div>
+    </aside>
+
+    <!-- Затемнение фона при открытом меню -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <main>
         @yield('content')
@@ -65,5 +82,44 @@
     <script src="/js/photos.js"></script>
     <script src="/js/contacts.js"></script>
     <script src="/js/interests.js"></script>
+    <script>
+    // Скрипт управления боковым меню
+    $(function() {
+        const $toggle = $('#menuToggle');
+        const $sidebar = $('#sidebarMenu');
+        const $close = $('#sidebarClose');
+        const $overlay = $('#sidebarOverlay');
+        
+        function openMenu() {
+            $sidebar.addClass('open');
+            $overlay.addClass('active');
+            $('body').addClass('menu-open');
+        }
+        
+        function closeMenu() {
+            $sidebar.removeClass('open');
+            $overlay.removeClass('active');
+            $('body').removeClass('menu-open');
+        }
+        
+        $toggle.on('click', openMenu);
+        $close.on('click', closeMenu);
+        $overlay.on('click', closeMenu);
+        
+        // Закрытие по ESC
+        $(document).on('keydown', function(e) {
+            if (e.key === 'Escape' && $sidebar.hasClass('open')) {
+                closeMenu();
+            }
+        });
+        
+        // Закрытие при клике на ссылку меню (для мобильных)
+        $sidebar.find('a.menu-item').on('click', function() {
+            if (window.innerWidth <= 768) {
+                closeMenu();
+            }
+        });
+    });
+    </script>
 </body>
 </html>
