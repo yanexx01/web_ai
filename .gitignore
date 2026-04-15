@@ -1,50 +1,27 @@
-```gitignore
+```
 # Compiled and build artifacts
 *.pyc
 __pycache__/
-*.o
-*.obj
-dist/
-build/
-*.class
-*.exe
-*.dll
-*.so
-*.a
-*.out
 
 # Dependencies
 node_modules/
 vendor/
 composer.lock
-*.lock
-.env
-.env.local
-.env.*
 
 # Logs and temp files
 *.log
 *.tmp
-*.swp
-*.swo
+
+# Environment
+.env
+.env.local
+.env.*
 
 # Editors
 .vscode/
 .idea/
-*.swp
-*.swo
 
-# Coverage
-coverage/
-htmlcov/
-.coverage
-
-# OS
+# OS generated files
 .DS_Store
 Thumbs.db
-
-# Cache
-.mypy_cache/
-.pytest_cache/
-.cache/
 ```

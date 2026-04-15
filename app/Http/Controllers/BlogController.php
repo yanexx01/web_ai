@@ -44,6 +44,17 @@ class BlogController extends Controller
     }
 
     /**
+     * Отображение формы добавления записи блога
+     */
+    public function create()
+    {
+        return view('blog.create', [
+            'pageTitle' => 'Добавить запись в блог',
+            'pageName' => 'blog'
+        ]);
+    }
+
+    /**
      * Обработка формы добавления записи блога
      */
     public function store(Request $request)

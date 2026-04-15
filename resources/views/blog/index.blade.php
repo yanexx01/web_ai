@@ -60,8 +60,16 @@
         @endif
         
         <p class="blog-info">Показано {{ count($blogs) }} из {{ $totalItems }} записей</p>
+        
+        {{-- Кнопка добавления новой записи --}}
+        <div class="add-post-link">
+            <a href="/blog/create" class="btn-add-post">+ Добавить запись в блог</a>
+        </div>
     @else
         <p>Записей в блоге пока нет. Будьте первым!</p>
+        <div class="add-post-link">
+            <a href="/blog/create" class="btn-add-post">+ Добавить первую запись в блог</a>
+        </div>
     @endif
 </div>
 
@@ -157,6 +165,30 @@
     margin-top: 15px;
     text-align: center;
     color: #666;
+}
+
+.add-post-link {
+    margin-top: 25px;
+    text-align: center;
+}
+
+.btn-add-post {
+    display: inline-block;
+    padding: 14px 35px;
+    background: #28a745;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 1.1em;
+    font-weight: bold;
+    transition: background 0.3s, transform 0.2s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.btn-add-post:hover {
+    background: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
 }
 </style>
 @endsection
