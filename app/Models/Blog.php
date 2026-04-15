@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Facades\DB;
+
 /**
  * Модель Blog для работы с таблицей blogs.
  * Представляет запись в блоге.
