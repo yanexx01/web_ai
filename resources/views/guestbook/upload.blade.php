@@ -14,8 +14,13 @@
         @csrf
         
         <div class="form-group">
-            <label for="messages_file">Выберите файл messages.inc:</label>
-            <input type="file" name="messages_file" id="messages_file" accept=".inc,.txt" required>
+            <label for="messages_file" class="form-label">Выберите файл messages.inc:</label>
+            <input type="file" 
+                   class="form-control" 
+                   name="messages_file" 
+                   id="messages_file" 
+                   accept=".inc,.txt" 
+                   required>
             <p class="form-text">
                 Файл должен содержать строки в формате: Дата;ФИО;E-mail;Текст отзыва<br>
                 Пример: 14.04.26;Иванов Иван Иванович;ivan@example.com;Отличный сайт!
