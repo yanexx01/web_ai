@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\GuestbookController;
+use App\Http\Controllers\BlogController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,3 +26,7 @@ Route::get('/guestbook', [GuestbookController::class, 'index'])->name('guestbook
 Route::post('/guestbook', [GuestbookController::class, 'store'])->name('guestbook.store');
 Route::get('/guestbook/upload', [GuestbookController::class, 'uploadForm'])->name('guestbook.upload.form');
 Route::post('/guestbook/upload', [GuestbookController::class, 'upload'])->name('guestbook.upload');
+
+// Блог
+Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
+Route::post('/blog', [BlogController::class, 'store'])->name('blog.store');
