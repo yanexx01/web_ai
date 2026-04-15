@@ -1,31 +1,50 @@
-```
+```gitignore
 # Compiled and build artifacts
 *.pyc
 __pycache__/
+*.o
+*.obj
+dist/
+build/
+*.class
+*.exe
+*.dll
+*.so
+*.a
+*.out
 
 # Dependencies
-vendor/
 node_modules/
+vendor/
+composer.lock
+*.lock
+.env
+.env.local
+.env.*
 
 # Logs and temp files
 *.log
 *.tmp
-
-# Environment
-.env
-.env.local
-*.env.*
+*.swp
+*.swo
 
 # Editors
 .vscode/
 .idea/
+*.swp
+*.swo
 
-# Laravel/Lumen specific
-bootstrap/cache/
-storage/logs/
-storage/framework/
-public/storage/
+# Coverage
+coverage/
+htmlcov/
+.coverage
 
-# Database
-*.sql
+# OS
+.DS_Store
+Thumbs.db
+
+# Cache
+.mypy_cache/
+.pytest_cache/
+.cache/
 ```

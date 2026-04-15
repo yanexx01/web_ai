@@ -1,77 +1,60 @@
 @extends('layouts.main')
 
 @section('content')
-<h1>Редактор Блога</h1>
-
-{{-- Форма добавления записи блога --}}
-<div class="blog-form">
-    <h2>Добавить запись</h2>
-    <form action="/blog" method="POST" enctype="multipart/form-data">
-        @csrf
-        <div class="form-group">
-            <label for="topic">Тема сообщения *</label>
-            <input type="text" name="topic" id="topic" required value="{{ old('topic') }}">
-        </div>
-        
-        <div class="form-group">
-            <label for="image">Изображение</label>
-            <input type="file" name="image" id="image" accept="image/*">
-        </div>
-        
-        <div class="form-group">
-            <label for="message">Текст сообщения *</label>
-            <textarea name="message" id="message" rows="5" required>{{ old('message') }}</textarea>
-        </div>
-        
-        <button type="submit">Добавить запись</button>
-    </form>
-    
-    @if($errors->any())
-        <div class="error-messages">
-            <ul>
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-</div>
+<h1>Мой Блог</h1>
 
 {{-- Список записей блога с пагинацией --}}
 <div class="blog-list">
-    <h2>Записи блога</h2>
-    
     @if(count($blogs) > 0)
         <div class="blog-posts">
             @foreach($blogs as $post)
                 <article class="blog-post">
                     @if($post->image)
                         <div class="blog-image">
-                            <img src="/storage/{{ $post->image }}" alt="{{ $post->topic }}">
+                            <img src="/storage/{{ $post->image }}" alt="{{ htmlspecialchars($post->topic) }}">
                         </div>
                     @endif
                     <div class="blog-content">
-                        <h3 class="blog-topic">{{ $post->topic }}</h3>
-                        <p class="blog-date">{{ $post->created_at }}</p>
-                        <p class="blog-message">{{ $post->message }}</p>
+                        <h3 class="blog-topic">{{ htmlspecialchars($post->topic) }}</h3>
+                        <p class="blog-date">{{ date('d.m.Y H:i', strtotime($post->created_at)) }}</p>
+                        <p class="blog-message">{{ nl2br(htmlspecialchars($post->message)) }}</p>
                     </div>
                 </article>
             @endforeach
         </div>
         
-        {{-- Пагинация --}}
+        {{-- Пагинация в формате: Страницы: 1 … 5 6 7 … 24 --}}
         @if($totalPages > 1)
             <div class="pagination">
-                @if($currentPage > 1)
-                    <a href="/blog?page={{ $currentPage - 1 }}" class="pagination-link">&laquo; Назад</a>
+                <span class="pagination-label">Страницы:</span>
+                
+                @php
+                    $startPage = max(1, $currentPage - 2);
+                    $endPage = min($totalPages, $currentPage + 2);
+                    
+                    // Показываем первую страницу всегда, если не входим в диапазон
+                    $showFirst = $startPage > 1;
+                    
+                    // Показываем последнюю страницу всегда, если не входим в диапазон
+                    $showLast = $endPage < $totalPages;
+                @endphp
+                
+                @if($showFirst)
+                    <a href="/blog?page=1" class="pagination-link {{ 1 === $currentPage ? 'active' : '' }}">1</a>
+                    @if($startPage > 2)
+                        <span class="pagination-ellipsis">…</span>
+                    @endif
                 @endif
                 
-                @for($i = 1; $i <= $totalPages; $i++)
+                @for($i = $startPage; $i <= $endPage; $i++)
                     <a href="/blog?page={{ $i }}" class="pagination-link {{ $i === $currentPage ? 'active' : '' }}">{{ $i }}</a>
                 @endfor
                 
-                @if($currentPage < $totalPages)
-                    <a href="/blog?page={{ $currentPage + 1 }}" class="pagination-link">Вперед &raquo;</a>
+                @if($showLast)
+                    @if($endPage < $totalPages - 1)
+                        <span class="pagination-ellipsis">…</span>
+                    @endif
+                    <a href="/blog?page={{ $totalPages }}" class="pagination-link {{ $totalPages === $currentPage ? 'active' : '' }}">{{ $totalPages }}</a>
                 @endif
             </div>
         @endif
@@ -83,63 +66,6 @@
 </div>
 
 <style>
-.blog-form {
-    margin-bottom: 30px;
-    padding: 20px;
-    background: #f9f9f9;
-    border-radius: 8px;
-}
-
-.form-group {
-    margin-bottom: 15px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-
-.form-group input[type="text"],
-.form-group textarea {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
-
-.form-group input[type="file"] {
-    padding: 8px 0;
-}
-
-button[type="submit"] {
-    padding: 10px 20px;
-    background: #28a745;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-button[type="submit"]:hover {
-    background: #218838;
-}
-
-.error-messages {
-    margin-top: 15px;
-    padding: 10px;
-    background: #ffe6e6;
-    border: 1px solid #ffcccc;
-    border-radius: 4px;
-    color: #cc0000;
-}
-
-.error-messages ul {
-    margin: 0;
-    padding-left: 20px;
-}
-
 .blog-list {
     margin-top: 30px;
 }
@@ -194,8 +120,14 @@ button[type="submit"]:hover {
     margin-top: 20px;
     display: flex;
     justify-content: center;
-    gap: 10px;
+    align-items: center;
+    gap: 8px;
     flex-wrap: wrap;
+}
+
+.pagination-label {
+    font-weight: bold;
+    margin-right: 10px;
 }
 
 .pagination-link {
@@ -214,6 +146,11 @@ button[type="submit"]:hover {
 .pagination-link.active {
     background: #0056b3;
     font-weight: bold;
+}
+
+.pagination-ellipsis {
+    padding: 8px;
+    color: #666;
 }
 
 .blog-info {

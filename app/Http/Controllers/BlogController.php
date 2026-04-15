@@ -9,37 +9,32 @@ use Illuminate\Support\Facades\Validator;
 class BlogController extends Controller
 {
     /**
-     * Количество записей на странице
+     * Количество записей на странице (константа)
      */
-    private int $perPage = 5;
+    private const PER_PAGE = 5;
 
     /**
-     * Отображение страницы редактора блога
+     * Отображение страницы "Мой Блог"
      */
     public function index(Request $request)
     {
         // Получаем номер страницы
         $page = $request->input('page', 1);
         
-        // Получаем все записи из БД, отсортированные по убыванию даты
-        $allBlogs = Blog::findAll();
+        // Получаем общее количество записей
+        $totalItems = Blog::count();
         
-        // Сортируем по убыванию даты
-        usort($allBlogs, function($a, $b) {
-            $dateA = strtotime($a->created_at ?? '0000-00-00 00:00:00');
-            $dateB = strtotime($b->created_at ?? '0000-00-00 00:00:00');
-            return $dateB - $dateA;
-        });
-
-        // Пагинация
-        $totalItems = count($allBlogs);
-        $totalPages = ceil($totalItems / $this->perPage);
-        $page = max(1, min($page, $totalPages > 0 ? $totalPages : 1));
-        $offset = ($page - 1) * $this->perPage;
-        $blogs = array_slice($allBlogs, $offset, $this->perPage);
+        // Рассчитываем общее количество страниц
+        $totalPages = $totalItems > 0 ? ceil($totalItems / self::PER_PAGE) : 1;
+        
+        // Ограничиваем номер страницы допустимым диапазоном
+        $page = max(1, min($page, $totalPages));
+        
+        // Получаем записи из БД с пагинацией и сортировкой по убыванию даты
+        $blogs = Blog::findPaginated(self::PER_PAGE, ($page - 1) * self::PER_PAGE);
 
         return view('blog.index', [
-            'pageTitle' => 'Редактор Блога',
+            'pageTitle' => 'Мой Блог',
             'pageName' => 'blog',
             'blogs' => $blogs,
             'currentPage' => $page,
