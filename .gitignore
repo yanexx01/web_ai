@@ -21,6 +21,7 @@ node_modules/
 .pytest_cache/
 target/
 .gradle/
+vendor/
 
 # Logs and temp files
 *.log
