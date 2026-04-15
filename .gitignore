@@ -21,6 +21,7 @@ target/
 .gradle/
 .mypy_cache/
 .pytest_cache/
+vendor/
 
 # Logs and temp files
 *.log
