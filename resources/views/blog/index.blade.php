@@ -61,14 +61,16 @@
         
         <p class="blog-info">Показано {{ count($blogs) }} из {{ $totalItems }} записей</p>
         
-        {{-- Кнопка добавления новой записи --}}
+        {{-- Кнопки добавления новой записи и загрузки CSV --}}
         <div class="add-post-link">
             <a href="/blog/create" class="btn-add-post">+ Добавить запись в блог</a>
+            <a href="/blog/upload" class="btn-upload-csv">📥 Загрузить из CSV</a>
         </div>
     @else
         <p>Записей в блоге пока нет. Будьте первым!</p>
         <div class="add-post-link">
             <a href="/blog/create" class="btn-add-post">+ Добавить первую запись в блог</a>
+            <a href="/blog/upload" class="btn-upload-csv">📥 Загрузить из CSV</a>
         </div>
     @endif
 </div>
@@ -187,6 +189,26 @@
 
 .btn-add-post:hover {
     background: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.btn-upload-csv {
+    display: inline-block;
+    padding: 14px 35px;
+    background: #17a2b8;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 1.1em;
+    font-weight: bold;
+    transition: background 0.3s, transform 0.2s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    margin-left: 15px;
+}
+
+.btn-upload-csv:hover {
+    background: #138496;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.3);
 }

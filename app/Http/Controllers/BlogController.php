@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Blog;
+use App\Http\Validators\FormValidation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class BlogController extends Controller
@@ -91,5 +93,117 @@ class BlogController extends Controller
         $blog->save();
 
         return redirect('/blog');
+    }
+
+    /**
+     * Отображение страницы "Загрузка сообщений блога" (CSV импорт)
+     */
+    public function showUploadForm()
+    {
+        return view('blog.upload', [
+            'pageTitle' => 'Загрузка сообщений блога',
+            'pageName' => 'blog'
+        ]);
+    }
+
+    /**
+     * Обработка загрузки CSV файла с сообщениями блога
+     */
+    public function uploadCsv(Request $request)
+    {
+        // Валидация файла CSV с использованием FormValidation
+        $validator = FormValidation::validateCsvFile($request->all());
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        $file = $request->file('csv_file');
+        $filePath = $file->getRealPath();
+
+        $successCount = 0;
+        $errorCount = 0;
+        $errors = [];
+
+        // Открываем файл для чтения
+        if (($handle = fopen($filePath, 'r')) !== false) {
+            // Пропускаем заголовок, если он есть
+            $header = fgetcsv($handle);
+            
+            // Проверяем, является ли первая строка заголовком
+            $isHeader = false;
+            if ($header && (strtolower($header[0]) === 'title' || strtolower($header[0]) === 'тема')) {
+                $isHeader = true;
+            } else {
+                // Если нет заголовка, возвращаем указатель на начало
+                rewind($handle);
+            }
+
+            $db = DB::connection()->getPdo();
+            
+            // Подготавливаем SQL запрос с использованием подготовленных выражений
+            $sql = "INSERT INTO blogs (topic, message, created_at) VALUES (?, ?, ?)";
+            $stmt = $db->prepare($sql);
+
+            $lineNumber = $isHeader ? 1 : 0;
+
+            while (($row = fgetcsv($handle)) !== false) {
+                $lineNumber++;
+
+                // Пропускаем пустые строки
+                if (empty($row) || (count($row) === 1 && empty($row[0]))) {
+                    continue;
+                }
+
+                // Проверяем минимальное количество полей
+                if (count($row) < 4) {
+                    $errors[] = "Строка {$lineNumber}: Недостаточно полей (ожидается минимум 4)";
+                    $errorCount++;
+                    continue;
+                }
+
+                $data = [
+                    'title' => trim($row[0] ?? ''),
+                    'message' => trim($row[1] ?? ''),
+                    'author' => trim($row[2] ?? ''),
+                    'created_at' => trim($row[3] ?? ''),
+                ];
+
+                // Валидация данных строки с использованием FormValidation
+                $rowValidator = FormValidation::validateCsvImport($data);
+
+                if ($rowValidator->fails()) {
+                    $errorMessages = implode(', ', $rowValidator->errors()->all());
+                    $errors[] = "Строка {$lineNumber}: {$errorMessages}";
+                    $errorCount++;
+                    continue;
+                }
+
+                // Выполняем подготовленный запрос для вставки записи
+                try {
+                    $stmt->execute([
+                        $data['title'],
+                        $data['message'],
+                        $data['created_at']
+                    ]);
+                    $successCount++;
+                } catch (\Exception $e) {
+                    $errors[] = "Строка {$lineNumber}: Ошибка при вставке в БД - " . $e->getMessage();
+                    $errorCount++;
+                }
+            }
+
+            fclose($handle);
+        } else {
+            return redirect()->back()
+                ->withErrors(['csv_file' => 'Не удалось открыть файл CSV'])
+                ->withInput();
+        }
+
+        return redirect('/blog')
+            ->with('success', "Успешно загружено записей: {$successCount}")
+            ->with('errors', $errors);
     }
 }
