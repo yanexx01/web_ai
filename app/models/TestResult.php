@@ -19,11 +19,24 @@ class TestResult extends BaseActiveRecord
      * @var int|null $id ID записи
      * @var string $fio ФИО студента
      * @var string $user_group Учебная группа
-     * @var string $q1 Ответ на вопрос 1
-     * @var string $q2 Ответ на вопрос 2
-     * @var string $q3 Ответ на вопрос 3
+     * @var array|string $answers Ответы на вопросы (JSON или массив)
      * @var int $score Количество правильных ответов
+     * @var int $total_questions Общее количество вопросов
      * @var string $is_correct Верно/неверно (passed/failed)
      * @var string $created_at Дата прохождения теста
      */
+    
+    /**
+     * Получить ответы как массив.
+     * 
+     * @return array
+     */
+    public function getAnswersArray(): array
+    {
+        if (is_string($this->answers)) {
+            $decoded = json_decode($this->answers, true);
+            return is_array($decoded) ? $decoded : [];
+        }
+        return is_array($this->answers) ? $this->answers : [];
+    }
 }

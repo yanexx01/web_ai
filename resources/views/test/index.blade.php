@@ -33,27 +33,30 @@
 
         <hr>
 
+        {{-- Вопросы из БД --}}
+        @foreach($questions as $index => $question)
         <div class="form-group">
-            <p><strong>Вопрос 1:</strong> Опишите основные принципы обеспечения безопасности жизнедеятельности.</p>
-            <textarea name="q1" rows="3">{{ old('q1', $oldInput['q1'] ?? '') }}</textarea>
+            <p><strong>Вопрос {{ $index + 1 }}:</strong> {{ $question->question_text }}</p>
+            
+            @if($question->isTextareaType())
+                {{-- Текстовый вопрос --}}
+                <textarea name="q{{ $index + 1 }}" rows="3">{{ old('q' . ($index + 1), $oldInput['q' . ($index + 1)] ?? '') }}</textarea>
+            @else
+                {{-- Вопрос с выбором ответа --}}
+                <div class="radio-group">
+                    @foreach($question->answers as $answer)
+                    <label>
+                        <input type="radio" 
+                               name="q{{ $index + 1 }}" 
+                               value="{{ $answer->id }}" 
+                               {{ (isset($oldInput['q' . ($index + 1)]) && $oldInput['q' . ($index + 1)] == $answer->id) ? 'checked' : '' }}>
+                        {{ $answer->answer_text }}
+                    </label>
+                    @endforeach
+                </div>
+            @endif
         </div>
-
-        <div class="form-group">
-            <p><strong>Вопрос 2:</strong> Что является основной целью БЖД?</p>
-            <div class="radio-group">
-                <label><input type="radio" name="q2" value="А" {{ (isset($oldInput['q2']) && $oldInput['q2'] == 'А') ? 'checked' : '' }}> А) Обеспечение комфортных условий труда</label>
-                <label><input type="radio" name="q2" value="Б" {{ (isset($oldInput['q2']) && $oldInput['q2'] == 'Б') ? 'checked' : '' }}> Б) Защита человека от опасностей</label>
-                <label><input type="radio" name="q2" value="В" {{ (isset($oldInput['q2']) && $oldInput['q2'] == 'В') ? 'checked' : '' }}> В) Повышение производительности</label>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <p><strong>Вопрос 3:</strong> Какие факторы относятся к опасным?</p>
-            <div class="radio-group">
-                <label><input type="radio" name="q3" value="phys_chem" {{ (isset($oldInput['q3']) && $oldInput['q3'] == 'phys_chem') ? 'checked' : '' }}> Физические и химические</label>
-                <label><input type="radio" name="q3" value="soc_econ" {{ (isset($oldInput['q3']) && $oldInput['q3'] == 'soc_econ') ? 'checked' : '' }}> Социальные и экономические</label>
-            </div>
-        </div>
+        @endforeach
 
         <div class="button-group">
             <input type="submit" value="Завершить тест" class="btn-submit">
@@ -83,12 +86,18 @@
                 <td>{{ $result->user_group ?? '-' }}</td>
                 <td>
                     <small>
-                        Q1: {{ mb_substr($result->q1 ?? '', 0, 30) }}{{ mb_strlen($result->q1 ?? '') > 30 ? '...' : '' }}<br>
-                        Q2: {{ $result->q2 ?? '-' }}<br>
-                        Q3: {{ $result->q3 ?? '-' }}
+                        @php
+                            $answersData = is_string($result->answers) ? json_decode($result->answers, true) : ($result->answers ?? []);
+                            if (!is_array($answersData)) {
+                                $answersData = [];
+                            }
+                        @endphp
+                        @foreach($answersData as $key => $answerValue)
+                            Q{{ str_replace('q', '', $key) }}: {{ $answerValue }}<br>
+                        @endforeach
                     </small>
                 </td>
-                <td>{{ $result->score ?? 0 }}/3</td>
+                <td>{{ $result->score ?? 0 }}/{{ $result->total_questions ?? 0 }}</td>
                 <td>
                     @if($result->is_correct === 'passed')
                         <span style="color: green; font-weight: bold;">Верно</span>
