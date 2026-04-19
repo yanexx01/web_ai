@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Question;
+use App\Models\Answer;
 use App\models\TestResult;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -14,55 +16,87 @@ class TestController extends Controller
         $resultHtml = '';
         $oldInput = [];
 
+        // Получаем все активные вопросы с ответами из БД
+        $questions = Question::getActiveQuestionsWithAnswers();
+
         if ($request->isMethod('POST')) {
             $oldInput = $request->all();
 
-            $validator = Validator::make($request->all(), [
+            // Динамически формируем правила валидации на основе вопросов из БД
+            $rules = [
                 'fio' => 'required|string|max:255',
                 'user_group' => 'required|string',
-                'q1' => 'required|string|min:10',
-                'q2' => 'required|in:А,Б,В',
-                'q3' => 'required|in:phys_chem,soc_econ',
-            ], [
+            ];
+            
+            $customMessages = [
                 'fio.required' => 'Введите ФИО.',
                 'user_group.required' => 'Выберите группу.',
-                'q1.required' => 'Ответьте на первый вопрос.',
-                'q1.min' => 'Ответ должен содержать не менее 10 символов.',
-                'q2.required' => 'Выберите ответ на второй вопрос.',
-                'q3.required' => 'Выберите ответ на третий вопрос.',
-            ]);
+            ];
+
+            foreach ($questions as $index => $question) {
+                $fieldName = 'q' . ($index + 1);
+                
+                if ($question->isTextareaType()) {
+                    // Для текстовых вопросов
+                    $rules[$fieldName] = 'required|string|min:10';
+                    $customMessages["{$fieldName}.required"] = "Ответьте на вопрос №" . ($index + 1) . ".";
+                    $customMessages["{$fieldName}.min"] = "Ответ должен содержать не менее 10 символов.";
+                } else {
+                    // Для вопросов с выбором ответа
+                    $validValues = [];
+                    foreach ($question->answers as $answer) {
+                        $validValues[] = (string)$answer->id;
+                    }
+                    $rules[$fieldName] = 'required|in:' . implode(',', $validValues);
+                    $customMessages["{$fieldName}.required"] = "Выберите ответ на вопрос №" . ($index + 1) . ".";
+                    $customMessages["{$fieldName}.in"] = "Выбран недопустимый вариант ответа.";
+                }
+            }
+
+            $validator = Validator::make($request->all(), $rules, $customMessages);
 
             if ($validator->passes()) {
                 // Проверка ответов
                 $score = 0;
-                $correctAnswers = [
-                    'q2' => 'Б',
-                    'q3' => 'phys_chem'
-                ];
+                $total = count($questions);
 
-                foreach ($correctAnswers as $key => $correct) {
-                    if (isset($request[$key]) && $request[$key] === $correct) {
-                        $score++;
+                foreach ($questions as $index => $question) {
+                    $fieldName = 'q' . ($index + 1);
+                    
+                    if ($question->isTextareaType()) {
+                        // Текстовый вопрос - засчитываем если длина > 10
+                        if (!empty($request[$fieldName]) && mb_strlen($request[$fieldName]) > 10) {
+                            $score++;
+                        }
+                    } else {
+                        // Вопрос с выбором ответа - проверяем на правильность
+                        $selectedAnswerId = $request[$fieldName];
+                        $correctAnswer = Answer::getCorrectByQuestionId($question->id);
+                        
+                        if ($correctAnswer && $selectedAnswerId == $correctAnswer->id) {
+                            $score++;
+                        }
                     }
                 }
 
-                // Текстовый вопрос (q1)
-                if (!empty($request['q1']) && mb_strlen($request['q1']) > 10) {
-                    $score++;
-                }
-
-                $total = 3;
-                $isCorrect = ($score >= 2) ? 'passed' : 'failed';
-                $isCorrectText = ($score >= 2) ? 'Верно' : 'Неверно';
+                $isCorrect = ($score >= ceil($total * 2 / 3)) ? 'passed' : 'failed';
+                $isCorrectText = ($score >= ceil($total * 2 / 3)) ? 'Верно' : 'Неверно';
 
                 // Сохраняем результат в БД
                 $testResult = new TestResult();
                 $testResult->fio = $request->input('fio');
                 $testResult->user_group = $request->input('user_group');
-                $testResult->q1 = $request->input('q1');
-                $testResult->q2 = $request->input('q2');
-                $testResult->q3 = $request->input('q3');
+                
+                // Сохраняем ответы в формате JSON
+                $answersData = [];
+                foreach ($questions as $index => $question) {
+                    $fieldName = 'q' . ($index + 1);
+                    $answersData[$fieldName] = $request->input($fieldName);
+                }
+                $testResult->answers = json_encode($answersData, JSON_UNESCAPED_UNICODE);
+                
                 $testResult->score = $score;
+                $testResult->total_questions = $total;
                 $testResult->is_correct = $isCorrect;
                 $testResult->created_at = date('Y-m-d H:i:s');
                 $testResult->save();
@@ -100,7 +134,8 @@ class TestController extends Controller
             'errorsHtml' => $errorsHtml,
             'resultHtml' => $resultHtml,
             'oldInput' => $oldInput,
-            'results' => $results
+            'results' => $results,
+            'questions' => $questions
         ]);
     }
 }
