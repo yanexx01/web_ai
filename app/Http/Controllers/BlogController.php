@@ -33,8 +33,9 @@ class BlogController extends Controller
         $page = max(1, min($page, $totalPages));
         
         // Получаем записи из БД с пагинацией и сортировкой по убыванию даты
-        $blogs = Blog::findPaginated(self::PER_PAGE, ($page - 1) * self::PER_PAGE);
 
+        $blogs = Blog::findPaginated(self::PER_PAGE, ($page - 1) * self::PER_PAGE);
+        
         return view('blog.index', [
             'pageTitle' => 'Мой Блог',
             'pageName' => 'blog',
@@ -43,6 +44,8 @@ class BlogController extends Controller
             'totalPages' => $totalPages,
             'totalItems' => $totalItems
         ]);
+        // $blogs = Post::latest()->paginate(10); 
+        // return view('blog.index', compact('blogs'));
     }
 
     /**
