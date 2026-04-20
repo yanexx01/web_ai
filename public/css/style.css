@@ -7,21 +7,33 @@
 body {
     font-family: Arial, Helvetica, sans-serif;
     background-color: #d1d1d1;
+    padding-top: 50px;
 }
 
 /* === МЕНЮ === */
 
-
+/* Хедер */
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50px;
+    background: #2c3e50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 15px;
+    z-index: 1002;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
 
 /* Кнопка открытия */
 .menu-toggle-btn {
-    position: fixed;
-    top: 15px;
-    left: 15px;
-    z-index: 1002;
+    position: static;
     width: 42px;
     height: 42px;
-    background: #2c3e50;
+    background: #34495e;
     color: #fff;
     border: none;
     border-radius: 8px;
@@ -30,18 +42,17 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     transition: 0.2s;
 }
-.menu-toggle-btn:hover { background: #34495e; }
+.menu-toggle-btn:hover { background: #3d566e; }
 
 /* Боковое меню */
 .sidebar {
     position: fixed;
-    top: 0;
+    top: 50px;
     left: -260px;
     width: 250px;
-    height: 100vh;
+    height: calc(100vh - 50px);
     background: #2c3e50;
     color: #ecf0f1;
     padding-top: 20px;

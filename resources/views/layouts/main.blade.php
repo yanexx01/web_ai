@@ -27,8 +27,15 @@
     </script>
 </head>
 
-<button id="menu-toggle" class="menu-toggle-btn">☰</button>
+<body>
 
+<!-- Хедер с часами -->
+<header class="header">
+    <button id="menu-toggle" class="menu-toggle-btn">☰</button>
+    <div id="clock" class="clock-display"></div>
+</header>
+
+<!-- Боковое меню -->
 <nav id="sidebar" class="sidebar">
     <ul class="sidebar-menu">
         <li><a href="/" class="menu-item" data-page="home">Главная</a></li>
@@ -44,7 +51,6 @@
 
 <!-- Затемняющий фон при открытом меню -->
 <div id="sidebar-overlay" class="sidebar-overlay"></div>
-<body>
 
 
 
