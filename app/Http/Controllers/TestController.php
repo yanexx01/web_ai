@@ -38,7 +38,7 @@ class TestController extends Controller
                 
                 if ($question->isTextareaType()) {
                     // Для текстовых вопросов
-                    $rules[$fieldName] = 'required|string|min:10';
+                    $rules[$fieldName] = 'required|string';
                     $customMessages["{$fieldName}.required"] = "Ответьте на вопрос №" . ($index + 1) . ".";
                     $customMessages["{$fieldName}.min"] = "Ответ должен содержать не менее 10 символов.";
                 } else {

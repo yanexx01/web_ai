@@ -115,10 +115,14 @@
                 </td>
                 <td>{{ $result->score ?? 0 }}/{{ $result->total_questions ?? 0 }}</td>
                 <td>
-                    @if($result->is_correct === 'passed')
-                        <span style="color: green; font-weight: bold;">Верно</span>
+                    @if($result->score == 0)
+                        <span style="color: red; font-weight: bold;">Неуд</span>
+                    @elseif($result->score == 1)
+                        <span style="color: yellow; font-weight: bold;">Удовл</span>
+                    @elseif($result->score == 2)
+                        <span style="color: green; font-weight: bold;">Хор</span>
                     @else
-                        <span style="color: red; font-weight: bold;">Неверно</span>
+                        <span style="color: green; font-weight: bold;">Отл</span>
                     @endif
                 </td>
             </tr>
