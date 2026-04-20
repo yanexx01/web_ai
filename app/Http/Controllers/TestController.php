@@ -65,8 +65,7 @@ class TestController extends Controller
                     $fieldName = 'q' . ($index + 1);
                     
                     if ($question->isTextareaType()) {
-                        // Текстовый вопрос - засчитываем если длина > 10
-                        if (!empty($request[$fieldName]) && mb_strlen($request[$fieldName]) > 10) {
+                        if (!empty($request[$fieldName]) && $question->checkAnswerContainsKeyword($request[$fieldName])) {
                             $score++;
                         }
                     } else {
@@ -114,6 +113,15 @@ class TestController extends Controller
                         $correctAnswer = Answer::getCorrectByQuestionId($question->id);
                         if ($correctAnswer) {
                             $correctAnswers['q' . ($index + 1)] = (string)$correctAnswer->id;
+                        } else {
+                        // Для текстовых вопросов сохраняем информацию о правильности ответа
+                            $fieldName = 'q' . ($index + 1);
+                            if (!empty($oldInput[$fieldName]) && $question->checkAnswerContainsKeyword($oldInput[$fieldName])) {
+                                $correctAnswers['q' . ($index + 1)] = 'correct';
+                            } 
+                            else {
+                                $correctAnswers['q' . ($index + 1)] = 'incorrect';
+                            }
                         }
                     }
                 }

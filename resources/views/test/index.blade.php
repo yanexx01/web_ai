@@ -1,9 +1,10 @@
 @extends('layouts.main')
-
 @section('content')
-<div class="test-page">
-    <h1>Тест по дисциплине: Безопасность жизнедеятельности</h1>
-    
+
+{{-- Контейнер ограничивает ширину, добавляет отступы и центрирует контент --}}
+<div class="container" style="max-width: 900px; margin: 40px auto; padding: 30px; background: #ffffff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+    <h2 style="margin-bottom: 20px;">Тест по дисциплине: Безопасность жизнедеятельности</h2>
+
     @if (!empty($errorsHtml))
         {!! $errorsHtml !!}
     @endif
@@ -15,19 +16,18 @@
     <form action="" method="post">
         @csrf
         
-        <div class="form-group">
-            <label>Фамилия Имя Отчество:</label>
-            <input type="text" name="fio" value="{{ old('fio', $oldInput['fio'] ?? '') }}">
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: bold;">Фамилия Имя Отчество:</label>
+            <input type="text" name="fio" value="{{ old('fio', $oldInput['fio'] ?? '') }}" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
         </div>
 
-        <div class="form-group">
-            <label>Группа:</label>
-            <select name="user_group">
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: bold;">Группа:</label>
+            <select name="user_group" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
                 <option value="">Выберите группу</option>
                 <option value="ИИ/б-25-1-о" {{ (isset($oldInput['user_group']) && $oldInput['user_group'] == 'ИИ/б-25-1-о') ? 'selected' : '' }}>ИИ/б-25-1-о</option>
                 <option value="ИИ/б-25-2-о" {{ (isset($oldInput['user_group']) && $oldInput['user_group'] == 'ИИ/б-25-2-о') ? 'selected' : '' }}>ИИ/б-25-2-о</option>
                 <option value="ПИ/б-23-1-о" {{ (isset($oldInput['user_group']) && $oldInput['user_group'] == 'ПИ/б-23-1-о') ? 'selected' : '' }}>ПИ/б-23-1-о</option>
-                
             </select>
         </div>
 
@@ -35,38 +35,23 @@
 
         {{-- Вопросы из БД --}}
         @foreach($questions as $index => $question)
-        <div class="form-group">
-            <p><strong>Вопрос {{ $index + 1 }}:</strong> {{ $question->question_text }}</p>
+        <div class="form-group" style="margin-bottom: 20px; padding: 15px; border: 1px solid #eee; border-radius: 6px; background: #fafafa;">
+            <p style="margin-bottom: 10px;"><strong>Вопрос {{ $index + 1 }}:</strong> {{ $question->question_text }}</p>
             
             @if($question->isTextareaType())
                 {{-- Текстовый вопрос --}}
-                <textarea name="q{{ $index + 1 }}" rows="3">{{ old('q' . ($index + 1), $oldInput['q' . ($index + 1)] ?? '') }}</textarea>
+                <textarea name="q{{ $index + 1 }}" rows="3" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">{{ old('q' . ($index + 1), $oldInput['q' . ($index + 1)] ?? '') }}</textarea>
             @else
-                {{-- Вопрос с выбором ответа --}}
+                {{-- Вопрос с выбором ответа (без подсветки валидации) --}}
                 <div class="radio-group">
                     @foreach($question->answers as $answer)
-                    <label style="display: block; padding: 8px; margin: 4px 0; border-radius: 4px; {{
-                        isset($correctAnswers['q' . ($index + 1)]) && $correctAnswers['q' . ($index + 1)] == $answer->id
-                            ? 'background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724;'
-                            : ''
-                    }} {{
-                        isset($oldInput['q' . ($index + 1)]) && $oldInput['q' . ($index + 1)] == $answer->id &&
-                        (!isset($correctAnswers['q' . ($index + 1)]) || $correctAnswers['q' . ($index + 1)] != $answer->id)
-                            ? 'background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24;'
-                            : ''
-                    }}">
+                    <label style="display: flex; align-items: center; padding: 8px 12px; margin: 4px 0; border-radius: 4px; border: 1px solid #ddd; background: #fff; cursor: pointer; transition: 0.2s;">
                         <input type="radio"
-                               name="q{{ $index + 1 }}"
-                               value="{{ $answer->id }}"
-                               {{ (isset($oldInput['q' . ($index + 1)]) && $oldInput['q' . ($index + 1)] == $answer->id) ? 'checked' : '' }}>
+                              name="q{{ $index + 1 }}"
+                              value="{{ $answer->id }}"
+                              {{ (isset($oldInput['q' . ($index + 1)]) && $oldInput['q' . ($index + 1)] == $answer->id) ? 'checked' : '' }}
+                              style="margin-right: 8px;">
                         {{ $answer->answer_text }}
-                        @if(isset($correctAnswers['q' . ($index + 1)]) && $correctAnswers['q' . ($index + 1)] == $answer->id)
-                            <span style="color: #155724; font-weight: bold;"> ✓ Правильный</span>
-                        @endif
-                        @if(isset($oldInput['q' . ($index + 1)]) && $oldInput['q' . ($index + 1)] == $answer->id &&
-                           (!isset($correctAnswers['q' . ($index + 1)]) || $correctAnswers['q' . ($index + 1)] != $answer->id))
-                            <span style="color: #721c24; font-weight: bold;"> ✗ Ваш ответ</span>
-                        @endif
                     </label>
                     @endforeach
                 </div>
@@ -74,101 +59,83 @@
         </div>
         @endforeach
 
-        <div class="button-group">
-            <input type="submit" value="Завершить тест" class="btn-submit">
+        <div class="button-group" style="margin-top: 20px;">
+            <input type="submit" value="Завершить тест" class="btn-submit" style="padding: 12px 24px; background: #0d6efd; color: #fff; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; transition: 0.2s;">
         </div>
     </form>
 
     {{-- Таблица сохраненных результатов тестов --}}
     @if(!empty($results))
     <hr style="margin: 40px 0;">
-    <h2>Сохраненные результаты тестов</h2>
-    <table border="1" cellpadding="10" cellspacing="0" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-        <thead>
-            <tr style="background-color: #f8f9fa;">
-                <th>Дата</th>
-                <th>ФИО</th>
-                <th>Группа</th>
-                <th>Ответы</th>
-                <th>Счет</th>
-                <th>Результат</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($results as $result)
-            <tr>
-                <td>{{ $result->created_at ?? '-' }}</td>
-                <td>{{ $result->fio ?? '-' }}</td>
-                <td>{{ $result->user_group ?? '-' }}</td>
-                <td>
-                    <small>
-                        @php
-                            $answersData = is_string($result->answers) ? json_decode($result->answers, true) : ($result->answers ?? []);
-                            if (!is_array($answersData)) {
-                                $answersData = [];
-                            }
-                        @endphp
-                        @foreach($answersData as $key => $answerValue)
+    <h2 style="margin-bottom: 20px;">Сохраненные результаты тестов</h2>
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+            <thead>
+                <tr style="background-color: #f8f9fa;">
+                    <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Дата</th>
+                    <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">ФИО</th>
+                    <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Группа</th>
+                    <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Ответы</th>
+                    <th style="padding: 12px; border: 1px solid #dee2e6; text-align: center;">Счет</th>
+                    <th style="padding: 12px; border: 1px solid #dee2e6; text-align: center;">Результат</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($results as $result)
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #dee2e6;">{{ $result->created_at ?? '-' }}</td>
+                    <td style="padding: 10px; border: 1px solid #dee2e6;">{{ $result->fio ?? '-' }}</td>
+                    <td style="padding: 10px; border: 1px solid #dee2e6;">{{ $result->user_group ?? '-' }}</td>
+                    <td style="padding: 10px; border: 1px solid #dee2e6;">
+                        <small>
                             @php
-                                $questionIndex = (int)str_replace('q', '', $key) - 1;
-                                $displayValue = $answerValue;
-                                $isCorrectAnswer = false;
-                                $correctAnswerObj = null;
+                                $answersData = is_string($result->answers) ? json_decode($result->answers, true) : ($result->answers ?? []);
+                                if (!is_array($answersData)) $answersData = [];
+                            @endphp
+                            @foreach($answersData as $key => $answerValue)
+                                @php
+                                    $questionIndex = (int)str_replace('q', '', $key) - 1;
+                                    $displayValue = $answerValue;
+                                    $isCorrectAnswer = false;
 
-                                // Если это числовой ID ответа, пробуем найти текст ответа и проверить правильность
-                                if (is_numeric($answerValue) && isset($questions[$questionIndex])) {
-                                    foreach ($questions[$questionIndex]->answers as $answer) {
-                                        if ($answer->id == $answerValue) {
-                                            // Извлекаем текст ответа без префикса "А)", "Б)" и т.д.
-                                            $answerText = preg_replace('/^[А-Я]\)\s*/', '', $answer->answer_text);
-                                            $displayValue = $answerText;
+                                    $isTextareaType = isset($questions[$questionIndex]) && $questions[$questionIndex]->isTextareaType();
 
-                                            // Проверяем, является ли этот ответ правильным
-                                            if ($answer->is_correct == 1) {
-                                                $isCorrectAnswer = true;
-                                            }
-                                            break;
-                                        }
-                                    }
-
-                                    // Найдем правильный ответ для отображения, если текущий неправильный
-                                    if (!$isCorrectAnswer) {
+                                    if ($isTextareaType && isset($questions[$questionIndex])) {
+                                        $isCorrectAnswer = $questions[$questionIndex]->checkAnswerContainsKeyword($answerValue);
+                                    } elseif (is_numeric($answerValue) && isset($questions[$questionIndex])) {
                                         foreach ($questions[$questionIndex]->answers as $answer) {
-                                            if ($answer->is_correct == 1) {
-                                                $correctAnswerObj = $answer;
+                                            if ($answer->id == $answerValue) {
+                                                $displayValue = preg_replace('/^[А-Я]\)\s*/', '', $answer->answer_text);
+                                                $isCorrectAnswer = ($answer->is_correct == 1);
                                                 break;
                                             }
                                         }
                                     }
-                                }
-                            @endphp
-                            <span style="{{ $isCorrectAnswer ? 'color: green;' : 'color: red;' }}">
-                                Q{{ str_replace('q', '', $key) }}: {{ $displayValue }}
-                                {{-- @if(!$isCorrectAnswer && isset($correctAnswerObj))
-                                    (Правильный: {{ preg_replace('/^[А-Я]\)\s*/', '', $correctAnswerObj->answer_text) }})
-                                @endif
-                                {{ $isCorrectAnswer ? '✓' : '✗' }} --}}
-                            </span>
-                            <br>
-                        @endforeach
-                    </small>
-                </td>
-                <td>{{ $result->score ?? 0 }}/{{ $result->total_questions ?? 0 }}</td>
-                <td>
-                    @if($result->score == 0)
-                        <span style="color: red; font-weight: bold;">Неуд</span>
-                    @elseif($result->score == 1)
-                        <span style="color: yellow; font-weight: bold;">Удовл</span>
-                    @elseif($result->score == 2)
-                        <span style="color: green; font-weight: bold;">Хор</span>
-                    @else
-                        <span style="color: green; font-weight: bold;">Отл</span>
-                    @endif
-                </td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
+                                @endphp
+                                <span style="{{ $isCorrectAnswer ? 'color: green; font-weight: 500;' : 'color: red; font-weight: 500;' }}">
+                                    Q{{ str_replace('q', '', $key) }}: {{ $displayValue }}
+                                </span><br>
+                            @endforeach
+                        </small>
+                    </td>
+                    <td style="padding: 10px; border: 1px solid #dee2e6; text-align: center;">{{ $result->score ?? 0 }}/{{ $result->total_questions ?? 0 }}</td>
+                    <td style="padding: 10px; border: 1px solid #dee2e6; text-align: center;">
+                        @if($result->score == 0)
+                            <span style="color: #dc3545; font-weight: bold;">Неуд</span>
+                        @elseif($result->score == 1)
+                            <span style="color: #fd7e14; font-weight: bold;">Удовл</span>
+                        @elseif($result->score == 2)
+                            <span style="color: #28a745; font-weight: bold;">Хор</span>
+                        @else
+                            <span style="color: #155724; font-weight: bold;">Отл</span>
+                        @endif
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
     @endif
 </div>
+
 @endsection

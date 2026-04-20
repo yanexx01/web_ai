@@ -47,6 +47,51 @@ class Question extends BaseActiveRecord
         return $this->question_type === 'textarea';
     }
 
+
+    public function getKeywords(): array
+    {
+        if (empty($this->keywords)) {
+            return [];
+        }
+
+        // Разделяем по запятой или новой строке, убираем пробелы и пустые значения
+        $keywords = preg_split('/[,\n]+/', $this->keywords);
+        $keywords = array_map('trim', $keywords);
+        $keywords = array_filter($keywords, function($kw) {
+            return mb_strlen($kw) > 0;
+        });
+
+        return array_values($keywords);
+    }
+
+    /**
+     * Проверить, содержит ли ответ хотя бы одно ключевое слово.
+     *
+     * @param string $answer Ответ пользователя
+     * @return bool
+     */
+    public function checkAnswerContainsKeyword(string $answer): bool
+    {
+        $keywords = $this->getKeywords();
+
+        // Если ключевые слова не заданы, используем старую логику (длина > 10)
+        if (empty($keywords)) {
+            return mb_strlen($answer) > 10;
+        }
+
+        $answerLower = mb_strtolower($answer);
+
+        foreach ($keywords as $keyword) {
+            $keywordLower = mb_strtolower($keyword);
+            if (mb_strpos($answerLower, $keywordLower) !== false) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
     /**
      * Получить правильный ответ для вопроса (для вопросов с выбором).
      * 

@@ -20,6 +20,7 @@ class QuestionsSeeder extends Seeder
         $question1Id = DB::table('questions')->insertGetId([
             'question_text' => 'Опишите основные принципы обеспечения безопасности жизнедеятельности.',
             'question_type' => 'textarea',
+            'keywords' => 'безопасность, воздействие, среда, защита, опасность',
             'is_active' => true,
             'order' => 1,
             'created_at' => now(),
@@ -40,7 +41,7 @@ class QuestionsSeeder extends Seeder
         DB::table('answers')->insert([
             [
                 'question_id' => $question2Id,
-                'answer_text' => 'А) Обеспечение комфортных условий труда',
+                'answer_text' => 'Обеспечение комфортных условий труда',
                 'is_correct' => false,
                 'order' => 1,
                 'created_at' => now(),
@@ -48,7 +49,7 @@ class QuestionsSeeder extends Seeder
             ],
             [
                 'question_id' => $question2Id,
-                'answer_text' => 'Б) Защита человека от опасностей',
+                'answer_text' => 'Защита человека от опасностей',
                 'is_correct' => true,
                 'order' => 2,
                 'created_at' => now(),
@@ -56,7 +57,7 @@ class QuestionsSeeder extends Seeder
             ],
             [
                 'question_id' => $question2Id,
-                'answer_text' => 'В) Повышение производительности',
+                'answer_text' => 'Повышение производительности',
                 'is_correct' => false,
                 'order' => 3,
                 'created_at' => now(),
