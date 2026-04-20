@@ -15,12 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('fio'); // ФИО студента
             $table->string('user_group'); // Учебная группа
-            $table->text('q1'); // Ответ на вопрос 1
-            $table->string('q2'); // Ответ на вопрос 2
-            $table->string('q3'); // Ответ на вопрос 3
+            $table->json('answers'); // Ответы на вопросы в формате JSON
             $table->integer('score'); // Количество правильных ответов
+            $table->integer('total_questions'); // Общее количество вопросов
             $table->string('is_correct'); // Верно/неверно (passed/failed)
-            $table->timestamps();
+            $table->timestamp('created_at')->nullable();
         });
     }
 

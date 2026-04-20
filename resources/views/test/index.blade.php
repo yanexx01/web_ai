@@ -93,7 +93,23 @@
                             }
                         @endphp
                         @foreach($answersData as $key => $answerValue)
-                            Q{{ str_replace('q', '', $key) }}: {{ $answerValue }}<br>
+                            @php
+                                $questionIndex = (int)str_replace('q', '', $key) - 1;
+                                $displayValue = $answerValue;
+
+                                // Если это числовой ID ответа, пробуем найти текст ответа
+                                if (is_numeric($answerValue) && isset($questions[$questionIndex])) {
+                                    foreach ($questions[$questionIndex]->answers as $answer) {
+                                        if ($answer->id == $answerValue) {
+                                            // Извлекаем текст ответа без префикса "А)", "Б)" и т.д.
+                                            $answerText = preg_replace('/^[А-Я]\)\s*/', '', $answer->answer_text);
+                                            $displayValue = $answerText;
+                                            break;
+                                        }
+                                    }
+                                }
+                            @endphp
+                            Q{{ str_replace('q', '', $key) }}: {{ $displayValue }}<br>
                         @endforeach
                     </small>
                 </td>
