@@ -32,6 +32,7 @@
     <div id="clock" class="clock-display"></div>
 </header>
 
+<!-- Боковое меню -->
 <nav id="sidebar" class="sidebar">
     <ul class="sidebar-menu">
         <li><a href="/" class="menu-item" data-page="home">Главная</a></li>

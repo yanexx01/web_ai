@@ -5,6 +5,12 @@
     <h1 class="blog-title">Мой Блог</h1>
     <p class="blog-subtitle">Последние новости и заметки</p>
 
+    @if(session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
+
     @if(!empty($blogs))
         <div class="blog-list">
             @foreach($blogs as $post)
@@ -98,6 +104,12 @@
     .blog-page-wrapper { max-width: 900px; margin: 80px auto 40px; padding: 0 20px; }
     .blog-title { text-align: center; color: #222; margin-bottom: 10px; font-size: 2rem; }
     .blog-subtitle { text-align: center; color: #555; margin-bottom: 30px; font-size: 1.1rem; }
+    
+    /* Уведомления */
+    .alert { padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; font-weight: 500; }
+    .alert-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .alert-error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    
     .blog-list { display: flex; flex-direction: column; gap: 30px; }
     .blog-post { background: #fff; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); overflow: hidden; transition: transform 0.3s ease, box-shadow 0.3s ease; }
     .blog-post:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); }

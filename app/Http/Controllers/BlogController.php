@@ -67,12 +67,16 @@ class BlogController extends Controller
         // Валидация данных с использованием FormValidation (через Validator)
         $validator = Validator::make($request->all(), [
             'topic' => 'required|string|max:255',
-            'image' => 'nullable|file|mimes:jpg,jpeg,png,gif,webp|max:2048',
+            'image' => 'nullable|file|mimes:jpg,jpeg,png,gif,webp|max:10240', // Максимум 10MB
             'message' => 'required|string',
+        ], [
+            'image.max' => 'Размер изображения не должен превышать 10MB. Пожалуйста, выберите изображение меньшего размера.',
+            'image.mimes' => 'Неверный формат изображения. Допустимые форматы: jpg, jpeg, png, gif, webp.',
+            'image.file' => 'Файл изображения поврежден или не может быть загружен.',
         ]);
 
         if ($validator->fails()) {
-            return redirect('/blog')
+            return redirect('/blog/create')
                 ->withErrors($validator)
                 ->withInput();
         }
@@ -85,9 +89,25 @@ class BlogController extends Controller
         // Обработка загрузки изображения
         if ($request->hasFile('image')) {
             $image = $request->file('image');
-            $imageName = time() . '.' . $image->getClientOriginalExtension();
-            $imagePath = $image->storeAs('blog_images', $imageName, 'public');
-            $blog->image = $imagePath;
+            
+            // Дополнительная проверка на корректность файла
+            if (!$image->isValid()) {
+                return redirect('/blog/create')
+                    ->withErrors(['image' => 'Ошибка при загрузке файла. Попробуйте еще раз.'])
+                    ->withInput();
+            }
+            
+            // Генерируем уникальное имя файла
+            $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+            
+            try {
+                $imagePath = $image->storeAs('blog_images', $imageName, 'public');
+                $blog->image = $imagePath;
+            } catch (\Exception $e) {
+                return redirect('/blog/create')
+                    ->withErrors(['image' => 'Не удалось сохранить изображение: ' . $e->getMessage()])
+                    ->withInput();
+            }
         } else {
             $blog->image = null;
         }
@@ -95,7 +115,7 @@ class BlogController extends Controller
         $blog->created_at = date('Y-m-d H:i:s');
         $blog->save();
 
-        return redirect('/blog');
+        return redirect('/blog')->with('success', 'Запись успешно добавлена!');
     }
 
     /**

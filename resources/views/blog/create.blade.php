@@ -29,12 +29,13 @@
         </div>
 
         <div class="form-group">
-            <label for="image">Изображение:</label>
+            <label for="image">Изображение (макс. 10MB):</label>
             <input type="file" 
                    id="image" 
                    name="image" 
-                   accept="image/*"
+                   accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
                    onchange="previewImage(this)">
+            <small class="form-hint">Допустимые форматы: JPG, JPEG, PNG, GIF, WEBP. Максимальный размер: 10MB</small>
             <div id="image-preview" class="image-preview"></div>
         </div>
 
@@ -59,7 +60,25 @@ function previewImage(input) {
     const preview = document.getElementById('image-preview');
     preview.innerHTML = '';
     
+    // Проверка размера файла (10MB = 10 * 1024 * 1024 байт)
+    const maxSize = 10 * 1024 * 1024;
     if (input.files && input.files[0]) {
+        const file = input.files[0];
+        
+        if (file.size > maxSize) {
+            alert('Размер файла превышает 10MB. Пожалуйста, выберите изображение меньшего размера.');
+            input.value = ''; // Очищаем input
+            return;
+        }
+        
+        // Проверка типа файла
+        const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+        if (!validTypes.includes(file.type)) {
+            alert('Неверный формат файла. Допустимые форматы: JPG, JPEG, PNG, GIF, WEBP.');
+            input.value = ''; // Очищаем input
+            return;
+        }
+        
         const reader = new FileReader();
         
         reader.onload = function(e) {
@@ -144,6 +163,14 @@ h1 {
 
 .form-group input[type="file"] {
     padding: 10px 0;
+}
+
+.form-hint {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.85em;
+    color: #666;
+    font-style: italic;
 }
 
 .image-preview {
