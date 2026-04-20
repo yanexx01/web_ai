@@ -27,36 +27,26 @@
     </script>
 </head>
 
-<body>
-    <header id="top">
-        <nav class="main-menu">
-            <ul>
-                <li><a href="/" class="menu-item" data-page="home">Главная</a></li>
-                <li><a href="/about" class="menu-item" data-page="about">Обо мне</a></li>
-                
-                <li class="dropdown">
-                    <a href="/interests" class="menu-item" data-page="interests">Мои интересы</a>
-                    <ul class="dropdown-menu">
-                        <li><a href="/interests#hobby" class="dropdown-link">Хобби</a></li>
-                        <li><a href="/interests#books" class="dropdown-link">Книги</a></li>
-                        <li><a href="/interests#music" class="dropdown-link">Музыка</a></li>
-                        <li><a href="/interests#games" class="dropdown-link">Игры</a></li>
-                    </ul>
-                </li>
+<button id="menu-toggle" class="menu-toggle-btn">☰</button>
 
-                <li><a href="/study" class="menu-item" data-page="study">Учеба</a></li>
-                <li><a href="/photos" class="menu-item" data-page="photos">Фотоальбом</a></li>
-                <li><a href="/history" class="menu-item" data-page="history">История просмотра</a></li>
-                <li><a href="/guestbook" class="menu-item" data-page="guestbook">Гостевая книга</a></li>
-                <li><a href="/contacts" class="menu-item" data-page="contacts">Обратная связь</a></li>
-                <li><a href="/test" class="menu-item" data-page="test">Тест</a></li>
-            </ul>
-            
-            <div id="clock" class="clock-display">
-                <p>Загрузка...</p>
-            </div>
-        </nav>
-    </header>
+<nav id="sidebar" class="sidebar">
+    <ul class="sidebar-menu">
+        <li><a href="/" class="menu-item" data-page="home">Главная</a></li>
+        <li><a href="/about" class="menu-item" data-page="about">Обо мне</a></li>
+        <li><a href="/study" class="menu-item" data-page="study">Учеба</a></li>
+        <li><a href="/photos" class="menu-item" data-page="photos">Фотоальбом</a></li>
+        <li><a href="/history" class="menu-item" data-page="history">История просмотра</a></li>
+        <li><a href="/guestbook" class="menu-item" data-page="guestbook">Гостевая книга</a></li>
+        <li><a href="/contacts" class="menu-item" data-page="contacts">Обратная связь</a></li>
+        <li><a href="/test" class="menu-item" data-page="test">Тест</a></li>
+    </ul>
+</nav>
+
+<!-- Затемняющий фон при открытом меню -->
+<div id="sidebar-overlay" class="sidebar-overlay"></div>
+<body>
+
+
 
     <main>
         @yield('content')

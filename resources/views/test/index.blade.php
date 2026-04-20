@@ -1,8 +1,7 @@
 @extends('layouts.main')
 @section('content')
 
-{{-- Контейнер ограничивает ширину, добавляет отступы и центрирует контент --}}
-<div class="container" style="max-width: 900px; margin: 40px auto; padding: 30px; background: #ffffff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+<div class="test-page">
     <h2 style="margin-bottom: 20px;">Тест по дисциплине: Безопасность жизнедеятельности</h2>
 
     @if (!empty($errorsHtml))
