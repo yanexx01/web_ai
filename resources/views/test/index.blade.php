@@ -45,12 +45,28 @@
                 {{-- Вопрос с выбором ответа --}}
                 <div class="radio-group">
                     @foreach($question->answers as $answer)
-                    <label>
-                        <input type="radio" 
-                               name="q{{ $index + 1 }}" 
-                               value="{{ $answer->id }}" 
+                    <label style="display: block; padding: 8px; margin: 4px 0; border-radius: 4px; {{
+                        isset($correctAnswers['q' . ($index + 1)]) && $correctAnswers['q' . ($index + 1)] == $answer->id
+                            ? 'background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724;'
+                            : ''
+                    }} {{
+                        isset($oldInput['q' . ($index + 1)]) && $oldInput['q' . ($index + 1)] == $answer->id &&
+                        (!isset($correctAnswers['q' . ($index + 1)]) || $correctAnswers['q' . ($index + 1)] != $answer->id)
+                            ? 'background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24;'
+                            : ''
+                    }}">
+                        <input type="radio"
+                               name="q{{ $index + 1 }}"
+                               value="{{ $answer->id }}"
                                {{ (isset($oldInput['q' . ($index + 1)]) && $oldInput['q' . ($index + 1)] == $answer->id) ? 'checked' : '' }}>
                         {{ $answer->answer_text }}
+                        @if(isset($correctAnswers['q' . ($index + 1)]) && $correctAnswers['q' . ($index + 1)] == $answer->id)
+                            <span style="color: #155724; font-weight: bold;"> ✓ Правильный</span>
+                        @endif
+                        @if(isset($oldInput['q' . ($index + 1)]) && $oldInput['q' . ($index + 1)] == $answer->id &&
+                           (!isset($correctAnswers['q' . ($index + 1)]) || $correctAnswers['q' . ($index + 1)] != $answer->id))
+                            <span style="color: #721c24; font-weight: bold;"> ✗ Ваш ответ</span>
+                        @endif
                     </label>
                     @endforeach
                 </div>
@@ -96,20 +112,44 @@
                             @php
                                 $questionIndex = (int)str_replace('q', '', $key) - 1;
                                 $displayValue = $answerValue;
+                                $isCorrectAnswer = false;
+                                $correctAnswerObj = null;
 
-                                // Если это числовой ID ответа, пробуем найти текст ответа
+                                // Если это числовой ID ответа, пробуем найти текст ответа и проверить правильность
                                 if (is_numeric($answerValue) && isset($questions[$questionIndex])) {
                                     foreach ($questions[$questionIndex]->answers as $answer) {
                                         if ($answer->id == $answerValue) {
                                             // Извлекаем текст ответа без префикса "А)", "Б)" и т.д.
                                             $answerText = preg_replace('/^[А-Я]\)\s*/', '', $answer->answer_text);
                                             $displayValue = $answerText;
+
+                                            // Проверяем, является ли этот ответ правильным
+                                            if ($answer->is_correct == 1) {
+                                                $isCorrectAnswer = true;
+                                            }
                                             break;
+                                        }
+                                    }
+
+                                    // Найдем правильный ответ для отображения, если текущий неправильный
+                                    if (!$isCorrectAnswer) {
+                                        foreach ($questions[$questionIndex]->answers as $answer) {
+                                            if ($answer->is_correct == 1) {
+                                                $correctAnswerObj = $answer;
+                                                break;
+                                            }
                                         }
                                     }
                                 }
                             @endphp
-                            Q{{ str_replace('q', '', $key) }}: {{ $displayValue }}<br>
+                            <span style="{{ $isCorrectAnswer ? 'color: green;' : 'color: red;' }}">
+                                Q{{ str_replace('q', '', $key) }}: {{ $displayValue }}
+                                {{-- @if(!$isCorrectAnswer && isset($correctAnswerObj))
+                                    (Правильный: {{ preg_replace('/^[А-Я]\)\s*/', '', $correctAnswerObj->answer_text) }})
+                                @endif
+                                {{ $isCorrectAnswer ? '✓' : '✗' }} --}}
+                            </span>
+                            <br>
                         @endforeach
                     </small>
                 </td>

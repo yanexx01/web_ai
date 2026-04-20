@@ -15,6 +15,7 @@ class TestController extends Controller
         $errorsHtml = '';
         $resultHtml = '';
         $oldInput = [];
+        $correctAnswer = [];
 
         // Получаем все активные вопросы с ответами из БД
         $questions = Question::getActiveQuestionsWithAnswers();
@@ -107,6 +108,16 @@ class TestController extends Controller
                     <p>Результат: <strong>{$isCorrectText}</strong></p>
                 </div>";
 
+                $correctAnswers = [];
+                foreach ($questions as $index => $question) {
+                    if (!$question->isTextareaType()) {
+                        $correctAnswer = Answer::getCorrectByQuestionId($question->id);
+                        if ($correctAnswer) {
+                            $correctAnswers['q' . ($index + 1)] = (string)$correctAnswer->id;
+                        }
+                    }
+                }
+
                 $oldInput = [];
             } else {
                 $errors = $validator->errors()->all();
@@ -135,7 +146,8 @@ class TestController extends Controller
             'resultHtml' => $resultHtml,
             'oldInput' => $oldInput,
             'results' => $results,
-            'questions' => $questions
+            'questions' => $questions,
+            'correctAnswer' => $correctAnswer ?? []
         ]);
     }
 }
