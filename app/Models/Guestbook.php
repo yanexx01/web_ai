@@ -1,17 +1,36 @@
 <?php
 
-namespace App\models;
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * Модель Guestbook для работы с таблицей guestbooks.
  * Представляет запись в гостевой книге.
  */
-class Guestbook extends BaseActiveRecord
+class Guestbook extends Model
 {
     /**
      * @var string Имя таблицы в БД
      */
-    protected static string $table = 'guestbooks';
+    protected $table = 'guestbooks';
+
+    /**
+     * Атрибуты, которые можно массово назначать
+     */
+    protected $fillable = [
+        'lastname',
+        'firstname',
+        'middlename',
+        'email',
+        'message',
+        'created_at'
+    ];
+
+    /**
+     * Отключаем автоматическое обновление updated_at
+     */
+    public $timestamps = false;
 
     /**
      * Поля модели (для документации)

@@ -1,17 +1,37 @@
 <?php
 
-namespace App\models;
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * Модель TestResult для работы с таблицей test_results.
  * Представляет результат прохождения теста пользователем.
  */
-class TestResult extends BaseActiveRecord
+class TestResult extends Model
 {
     /**
      * @var string Имя таблицы в БД
      */
-    protected static string $table = 'test_results';
+    protected $table = 'test_results';
+
+    /**
+     * Атрибуты, которые можно массово назначать
+     */
+    protected $fillable = [
+        'fio',
+        'user_group',
+        'answers',
+        'score',
+        'total_questions',
+        'is_correct',
+        'created_at'
+    ];
+
+    /**
+     * Отключаем автоматическое обновление updated_at
+     */
+    public $timestamps = false;
 
     /**
      * Поля модели (для документации)
