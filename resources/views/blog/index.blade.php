@@ -11,6 +11,17 @@
         </div>
     @endif
 
+    @if(session('errors') && is_array(session('errors')))
+        <div class="alert alert-error">
+            <h5 style="margin-top: 0;">Ошибки при загрузке:</h5>
+            <ul style="margin-bottom: 0; padding-left: 20px;">
+                @foreach(session('errors') as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     @if(!empty($blogs))
         <div class="blog-list">
             @foreach($blogs as $post)

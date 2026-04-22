@@ -139,9 +139,9 @@ class TestController extends Controller
         }
 
         // Получаем все результаты тестов из БД
-        $results = TestResult::findAll();
+        $results = TestResult::orderBy('created_at', 'desc')->get();
         
-        // Сортируем по убыванию даты
+        // Сортируем по убыванию даты (уже отсортировано запросом, но оставляем для надежности)
         usort($results, function($a, $b) {
             $dateA = strtotime($a->created_at ?? '0000-00-00 00:00:00');
             $dateB = strtotime($b->created_at ?? '0000-00-00 00:00:00');
