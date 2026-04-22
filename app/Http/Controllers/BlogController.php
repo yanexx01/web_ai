@@ -207,8 +207,13 @@ class BlogController extends Controller
                 ->withInput();
         }
 
+        if ($errorCount > 0 && !empty($errors)) {
+            return redirect('/blog')
+                ->with('success', "Успешно загружено записей: {$successCount}")
+                ->with('errors', $errors);
+        }
+
         return redirect('/blog')
-            ->with('success', "Успешно загружено записей: {$successCount}")
-            ->with('errors', $errors);
+            ->with('success', "Успешно загружено записей: {$successCount}");
     }
 }
