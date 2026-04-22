@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('content')
-<div class="upload-page">
+<div class="contact-page">
     <h1>Загрузка сообщений гостевой книги</h1>
     
     @if(session('success'))

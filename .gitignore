@@ -4,6 +4,12 @@ composer.lock
 .env
 .env.*
 !.env.example
+public/storage/
+storage/logs/
+storage/framework/cache/
+storage/framework/sessions/
+storage/framework/views/
+bootstrap/cache/
 
 # Compiled and build artifacts
 *.php~
