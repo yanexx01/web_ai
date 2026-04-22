@@ -142,11 +142,11 @@ class TestController extends Controller
         $results = TestResult::orderBy('created_at', 'desc')->get();
         
         // Сортируем по убыванию даты (уже отсортировано запросом, но оставляем для надежности)
-        usort($results, function($a, $b) {
-            $dateA = strtotime($a->created_at ?? '0000-00-00 00:00:00');
-            $dateB = strtotime($b->created_at ?? '0000-00-00 00:00:00');
-            return $dateB - $dateA;
-        });
+        // usort($results, function($a, $b) {
+        //     $dateA = strtotime($a->created_at ?? '0000-00-00 00:00:00');
+        //     $dateB = strtotime($b->created_at ?? '0000-00-00 00:00:00');
+        //     return $dateB - $dateA;
+        // });
 
         return view('test.index', [
             'title' => 'Тест по БЖД',

@@ -34,16 +34,15 @@ class Question extends Model
     /**
      * Получить все активные вопросы с ответами, отсортированные по порядку.
      * 
-     * @return array<Question> Массив объектов Question
+     * @return \Illuminate\Database\Eloquent\Collection Коллекция объектов Question
      */
-    public static function getActiveQuestionsWithAnswers(): array
+    public static function getActiveQuestionsWithAnswers(): \Illuminate\Database\Eloquent\Collection
     {
         return self::where('is_active', 1)
             ->orderBy('order', 'asc')
             ->orderBy('id', 'asc')
             ->with('answers')
-            ->get()
-            ->toArray();
+            ->get();
     }
 
     /**
