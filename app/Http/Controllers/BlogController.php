@@ -3,10 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Blog;
-use App\Http\Validators\FormValidation;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 
 class BlogController extends Controller
 {
@@ -33,8 +30,10 @@ class BlogController extends Controller
         $page = max(1, min($page, $totalPages));
         
         // Получаем записи из БД с пагинацией и сортировкой по убыванию даты
-
-        $blogs = Blog::findPaginated(self::PER_PAGE, ($page - 1) * self::PER_PAGE);
+        $blogs = Blog::orderBy('created_at', 'desc')
+            ->offset(($page - 1) * self::PER_PAGE)
+            ->limit(self::PER_PAGE)
+            ->get();
         
         return view('blog.index', [
             'pageTitle' => 'Мой Блог',
@@ -44,8 +43,6 @@ class BlogController extends Controller
             'totalPages' => $totalPages,
             'totalItems' => $totalItems
         ]);
-        // $blogs = Post::latest()->paginate(10); 
-        // return view('blog.index', compact('blogs'));
     }
 
     /**
@@ -64,10 +61,10 @@ class BlogController extends Controller
      */
     public function store(Request $request)
     {
-        // Валидация данных с использованием FormValidation (через Validator)
-        $validator = Validator::make($request->all(), [
+        // Валидация данных
+        $validator = $request->validate([
             'topic' => 'required|string|max:255',
-            'image' => 'nullable|file|mimes:jpg,jpeg,png,gif,webp|max:10240', // Максимум 10MB
+            'image' => 'nullable|file|mimes:jpg,jpeg,png,gif,webp|max:10240',
             'message' => 'required|string',
         ], [
             'image.max' => 'Размер изображения не должен превышать 10MB. Пожалуйста, выберите изображение меньшего размера.',
@@ -75,22 +72,17 @@ class BlogController extends Controller
             'image.file' => 'Файл изображения поврежден или не может быть загружен.',
         ]);
 
-        if ($validator->fails()) {
-            return redirect('/blog/create')
-                ->withErrors($validator)
-                ->withInput();
-        }
-
         // Создаем новую запись в БД
-        $blog = new Blog();
-        $blog->topic = $request->input('topic');
-        $blog->message = $request->input('message');
+        $blogData = [
+            'topic' => $request->input('topic'),
+            'message' => $request->input('message'),
+            'created_at' => date('Y-m-d H:i:s'),
+        ];
         
         // Обработка загрузки изображения
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             
-            // Дополнительная проверка на корректность файла
             if (!$image->isValid()) {
                 return redirect('/blog/create')
                     ->withErrors(['image' => 'Ошибка при загрузке файла. Попробуйте еще раз.'])
@@ -102,18 +94,15 @@ class BlogController extends Controller
             
             try {
                 $imagePath = $image->storeAs('blog_images', $imageName, 'public');
-                $blog->image = $imagePath;
+                $blogData['image'] = $imagePath;
             } catch (\Exception $e) {
                 return redirect('/blog/create')
                     ->withErrors(['image' => 'Не удалось сохранить изображение: ' . $e->getMessage()])
                     ->withInput();
             }
-        } else {
-            $blog->image = null;
         }
         
-        $blog->created_at = date('Y-m-d H:i:s');
-        $blog->save();
+        Blog::create($blogData);
 
         return redirect('/blog')->with('success', 'Запись успешно добавлена!');
     }
@@ -134,14 +123,10 @@ class BlogController extends Controller
      */
     public function uploadCsv(Request $request)
     {
-        // Валидация файла CSV с использованием FormValidation
-        $validator = FormValidation::validateCsvFile($request->all());
-
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
+        // Валидация файла CSV
+        $request->validate([
+            'csv_file' => 'required|file|mimes:csv,txt|max:10240',
+        ]);
 
         $file = $request->file('csv_file');
         $filePath = $file->getRealPath();
@@ -160,15 +145,8 @@ class BlogController extends Controller
             if ($header && (strtolower($header[0]) === 'title' || strtolower($header[0]) === 'тема')) {
                 $isHeader = true;
             } else {
-                // Если нет заголовка, возвращаем указатель на начало
                 rewind($handle);
             }
-
-            $db = DB::connection()->getPdo();
-            
-            // Подготавливаем SQL запрос с использованием подготовленных выражений
-            $sql = "INSERT INTO blogs (topic, message, created_at) VALUES (?, ?, ?)";
-            $stmt = $db->prepare($sql);
 
             $lineNumber = $isHeader ? 1 : 0;
 
@@ -188,28 +166,32 @@ class BlogController extends Controller
                 }
 
                 $data = [
-                    'title' => trim($row[0] ?? ''),
+                    'topic' => trim($row[0] ?? ''),
                     'message' => trim($row[1] ?? ''),
                     'author' => trim($row[2] ?? ''),
                     'created_at' => trim($row[3] ?? ''),
                 ];
 
-                // Валидация данных строки с использованием FormValidation
-                $rowValidator = FormValidation::validateCsvImport($data);
+                // Валидация данных строки
+                $validator = \Illuminate\Support\Facades\Validator::make($data, [
+                    'topic' => 'required|string|max:255',
+                    'message' => 'required|string',
+                    'created_at' => 'required|date_format:Y-m-d H:i:s',
+                ]);
 
-                if ($rowValidator->fails()) {
-                    $errorMessages = implode(', ', $rowValidator->errors()->all());
+                if ($validator->fails()) {
+                    $errorMessages = implode(', ', $validator->errors()->all());
                     $errors[] = "Строка {$lineNumber}: {$errorMessages}";
                     $errorCount++;
                     continue;
                 }
 
-                // Выполняем подготовленный запрос для вставки записи
+                // Вставляем запись через Eloquent
                 try {
-                    $stmt->execute([
-                        $data['title'],
-                        $data['message'],
-                        $data['created_at']
+                    Blog::create([
+                        'topic' => $data['topic'],
+                        'message' => $data['message'],
+                        'created_at' => $data['created_at'],
                     ]);
                     $successCount++;
                 } catch (\Exception $e) {

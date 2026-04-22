@@ -2,16 +2,34 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Model;
+
 /**
  * Модель Question для работы с таблицей questions.
  * Представляет вопрос теста.
  */
-class Question extends BaseActiveRecord
+class Question extends Model
 {
     /**
      * @var string Имя таблицы в БД
      */
-    protected static string $table = 'questions';
+    protected $table = 'questions';
+
+    /**
+     * Атрибуты, которые можно массово назначать
+     */
+    protected $fillable = [
+        'question_text',
+        'question_type',
+        'is_active',
+        'order',
+        'keywords'
+    ];
+
+    /**
+     * Отключаем автоматическое обновление updated_at
+     */
+    public $timestamps = false;
 
     /**
      * Получить все активные вопросы с ответами, отсортированные по порядку.
@@ -20,21 +38,12 @@ class Question extends BaseActiveRecord
      */
     public static function getActiveQuestionsWithAnswers(): array
     {
-        $table = static::getTable();
-        $db = \Illuminate\Support\Facades\DB::connection()->getPdo();
-        
-        $sql = "SELECT * FROM {$table} WHERE is_active = 1 ORDER BY `order` ASC, id ASC";
-        $stmt = $db->query($sql);
-        
-        $questions = [];
-        while ($data = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-            $question = new static($data);
-            // Загружаем ответы для вопроса
-            $question->answers = Answer::getByQuestionId($data['id']);
-            $questions[] = $question;
-        }
-        
-        return $questions;
+        return self::where('is_active', 1)
+            ->orderBy('order', 'asc')
+            ->orderBy('id', 'asc')
+            ->with('answers')
+            ->get()
+            ->toArray();
     }
 
     /**
@@ -110,5 +119,13 @@ class Question extends BaseActiveRecord
         }
         
         return null;
+    }
+
+    /**
+     * Связь с ответами
+     */
+    public function answers()
+    {
+        return $this->hasMany(Answer::class);
     }
 }

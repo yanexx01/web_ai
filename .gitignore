@@ -1,76 +1,26 @@
-# Laravel-specific ignores
-vendor/
-composer.lock
-.env
-.env.*
-!.env.example
-public/storage/
-storage/logs/
-storage/framework/cache/
-storage/framework/sessions/
-storage/framework/views/
-bootstrap/cache/
-
+```
 # Compiled and build artifacts
-*.php~
 *.pyc
-*.o
-*.obj
-*.exe
-*.dll
-*.so
-*.a
-*.out
+__pycache__/
 
 # Dependencies
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+vendor/
+composer.lock
 
-# Build and distribution
-dist/
-build/
-target/
-
-# Logs
+# Logs and temp files
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+*.tmp
 
-# Environment specific
+# Environment
+.env
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
+*.env.*
 
-# IDE and editor files
+# Editors
 .vscode/
 .idea/
-*.swp
-*.swo
-*~
 
 # OS generated files
 .DS_Store
 Thumbs.db
-
-# Cache directories
-.cache/
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-.pytest_cache/
-.mypy_cache/
-
-# Testing
-coverage/
-htmlcov/
-.coverage
-
-# Temporary files
-*.tmp
-*.temp
+```
