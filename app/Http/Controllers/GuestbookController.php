@@ -2,37 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\models\Guestbook;
-use App\models\TestResult;
+use App\Models\Guestbook;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 
 class GuestbookController extends Controller
 {
-    /**
-     * Путь к файлу для хранения сообщений (messages.inc)
-     */
-    private string $messagesFile;
-
-    public function __construct()
-    {
-        $this->messagesFile = storage_path('app/messages.inc');
-    }
-
     /**
      * Отображение страницы гостевой книги
      */
     public function index()
     {
         // Получаем все сообщения из БД, отсортированные по убыванию даты
-        $messages = Guestbook::findAll();
-        
-        // Сортируем по убыванию даты (если created_at есть в атрибутах)
-        usort($messages, function($a, $b) {
-            $dateA = strtotime($a->created_at ?? '0000-00-00 00:00:00');
-            $dateB = strtotime($b->created_at ?? '0000-00-00 00:00:00');
-            return $dateB - $dateA;
-        });
+        $messages = Guestbook::orderBy('created_at', 'desc')->get();
 
         return view('guestbook.index', [
             'pageTitle' => 'Гостевая книга',
@@ -47,7 +28,7 @@ class GuestbookController extends Controller
     public function store(Request $request)
     {
         // Валидация данных
-        $validator = Validator::make($request->all(), [
+        $request->validate([
             'lastname' => 'required|string|max:255',
             'firstname' => 'required|string|max:255',
             'middlename' => 'nullable|string|max:255',
@@ -55,24 +36,15 @@ class GuestbookController extends Controller
             'message' => 'required|string',
         ]);
 
-        if ($validator->fails()) {
-            return redirect('/guestbook')
-                ->withErrors($validator)
-                ->withInput();
-        }
-
         // Создаем новую запись в БД
-        $guestbook = new Guestbook();
-        $guestbook->lastname = $request->input('lastname');
-        $guestbook->firstname = $request->input('firstname');
-        $guestbook->middlename = $request->input('middlename');
-        $guestbook->email = $request->input('email');
-        $guestbook->message = $request->input('message');
-        $guestbook->created_at = date('Y-m-d H:i:s');
-        $guestbook->save();
-
-        // Сохраняем данные в текстовый файл messages.inc
-        $this->saveToFile($guestbook);
+        Guestbook::create([
+            'lastname' => $request->input('lastname'),
+            'firstname' => $request->input('firstname'),
+            'middlename' => $request->input('middlename'),
+            'email' => $request->input('email'),
+            'message' => $request->input('message'),
+            'created_at' => date('Y-m-d H:i:s'),
+        ]);
 
         return redirect('/guestbook');
     }
@@ -93,14 +65,9 @@ class GuestbookController extends Controller
      */
     public function upload(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $request->validate([
             'messages_file' => 'required|file|mimes:inc,txt',
         ]);
-
-        if ($validator->fails()) {
-            return redirect('/guestbook/upload')
-                ->withErrors($validator);
-        }
 
         $file = $request->file('messages_file');
         $filePath = $file->storeAs('uploads', 'messages.inc', 'public');
@@ -127,31 +94,18 @@ class GuestbookController extends Controller
                     $dateObj = \DateTime::createFromFormat('d.m.y', $dateStr);
                     $createdAt = $dateObj ? $dateObj->format('Y-m-d H:i:s') : date('Y-m-d H:i:s');
 
-                    $guestbook = new Guestbook();
-                    $guestbook->lastname = $lastname;
-                    $guestbook->firstname = $firstname;
-                    $guestbook->middlename = $middlename;
-                    $guestbook->email = $email;
-                    $guestbook->message = $message;
-                    $guestbook->created_at = $createdAt;
-                    $guestbook->save();
+                    Guestbook::create([
+                        'lastname' => $lastname,
+                        'firstname' => $firstname,
+                        'middlename' => $middlename,
+                        'email' => $email,
+                        'message' => $message,
+                        'created_at' => $createdAt,
+                    ]);
                 }
             }
         }
 
         return redirect('/guestbook')->with('success', 'Файл успешно загружен и данные импортированы!');
-    }
-
-    /**
-     * Сохранение записи в текстовый файл
-     * Формат: Дата;ФИО;E-mail;Текст отзыва
-     */
-    private function saveToFile(Guestbook $guestbook): void
-    {
-        $fio = trim($guestbook->lastname . ' ' . $guestbook->firstname . ' ' . $guestbook->middlename);
-        $date = date('d.m.y');
-        $line = "{$date};{$fio};{$guestbook->email};{$guestbook->message}\n";
-
-        file_put_contents($this->messagesFile, $line, FILE_APPEND | LOCK_EX);
     }
 }
