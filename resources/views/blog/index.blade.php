@@ -48,8 +48,8 @@
         </div>
 
         {{-- Пагинация --}}
-        @if($totalPages > 1)
-            <div class="pagination-wrapper">
+        <div class="pagination-wrapper">
+            @if($totalPages > 1)
                 <nav>
                     @php
                         $startPage = max(1, $currentPage - 2);
@@ -78,11 +78,14 @@
                         <a href="{{ request()->fullUrlWithQuery(['page' => $currentPage + 1]) }}" class="page-link next">Далее &raquo;</a>
                     @endif
                 </nav>
-                <p class="pagination-info">Страница {{ $currentPage }} из {{ $totalPages }} (всего {{ $totalItems }} записей)</p>
+                {{-- <p class="pagination-info">Страница {{ $currentPage }} из {{ $totalPages }} (всего {{ $totalItems }} записей)</p>
             </div>
         @else
             <p class="pagination-info">Показано {{ count((array) $blogs) }} из {{ $totalItems }} записей</p>
-        @endif
+        @endif --}}
+            @endif
+            <p class="pagination-info">Страница {{ $currentPage }} из {{ $totalPages }} (всего {{ $totalItems }} записей)</p>
+        </div>
     @else
         <div class="empty-state">
             <p>Записей в блоге пока нет. Добавьте первую запись!</p>

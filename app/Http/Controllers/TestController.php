@@ -101,32 +101,15 @@ class TestController extends Controller
                 $testResult->created_at = date('Y-m-d H:i:s');
                 $testResult->save();
 
-                $resultHtml = "<div class='alert alert-success'>
-                    <h3>Результат теста</h3>
-                    <p>Ваш счет: <strong>{$score}</strong> из {$total}</p>
-                    <p>Результат: <strong>{$isCorrectText}</strong></p>
-                </div>";
+                // Сохраняем данные результата во flash-сессии для отображения после редиректа
+                $testResultData = [
+                    'score' => $score,
+                    'total' => $total,
+                    'isCorrectText' => $isCorrectText
+                ];
 
-                $correctAnswers = [];
-                foreach ($questions as $index => $question) {
-                    if (!$question->isTextareaType()) {
-                        $correctAnswer = Answer::getCorrectByQuestionId($question->id);
-                        if ($correctAnswer) {
-                            $correctAnswers['q' . ($index + 1)] = (string)$correctAnswer->id;
-                        } else {
-                        // Для текстовых вопросов сохраняем информацию о правильности ответа
-                            $fieldName = 'q' . ($index + 1);
-                            if (!empty($oldInput[$fieldName]) && $question->checkAnswerContainsKeyword($oldInput[$fieldName])) {
-                                $correctAnswers['q' . ($index + 1)] = 'correct';
-                            } 
-                            else {
-                                $correctAnswers['q' . ($index + 1)] = 'incorrect';
-                            }
-                        }
-                    }
-                }
+                return redirect()->route('test')->with('test_result', $testResultData);
 
-                $oldInput = [];
             } else {
                 $errors = $validator->errors()->all();
                 $errorsHtml = '<div class="validation-errors" style="color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; border-radius: 5px; margin-bottom: 20px;">';
@@ -140,13 +123,6 @@ class TestController extends Controller
 
         // Получаем все результаты тестов из БД
         $results = TestResult::orderBy('created_at', 'desc')->get();
-        
-        // Сортируем по убыванию даты (уже отсортировано запросом, но оставляем для надежности)
-        // usort($results, function($a, $b) {
-        //     $dateA = strtotime($a->created_at ?? '0000-00-00 00:00:00');
-        //     $dateB = strtotime($b->created_at ?? '0000-00-00 00:00:00');
-        //     return $dateB - $dateA;
-        // });
 
         return view('test.index', [
             'title' => 'Тест по БЖД',
