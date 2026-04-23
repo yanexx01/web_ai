@@ -6,6 +6,9 @@ use App\Http\Controllers\TestController;
 use App\Http\Controllers\GuestbookController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Admin\AdminAuthController;
+use App\Http\Controllers\Admin\BlogController as AdminBlogController;
+use App\Http\Controllers\Admin\GuestbookController as AdminGuestbookController;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,3 +49,31 @@ Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// Административная зона
+Route::prefix('admin')->name('admin.')->group(function () {
+    // Маршруты аутентификации администратора (без middleware)
+    Route::get('/login', [AdminAuthController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [AdminAuthController::class, 'login'])->name('login.post');
+    Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
+
+    // Защищенные маршруты админки
+    Route::middleware(['auth', 'admin'])->group(function () {
+        // Главная страница админки
+        Route::get('/', function () {
+            return view('admin.dashboard');
+        })->name('dashboard');
+
+        // Блог
+        Route::get('/blog', [AdminBlogController::class, 'index'])->name('blog.index');
+        Route::get('/blog/create', [AdminBlogController::class, 'create'])->name('blog.create');
+        Route::post('/blog/store', [AdminBlogController::class, 'store'])->name('blog.store');
+        Route::get('/blog/upload', [AdminBlogController::class, 'showUploadForm'])->name('blog.upload.form');
+        Route::post('/blog/upload', [AdminBlogController::class, 'uploadCsv'])->name('blog.upload');
+
+        // Гостевая книга
+        Route::get('/guestbook', [AdminGuestbookController::class, 'index'])->name('guestbook.index');
+        Route::get('/guestbook/upload', [AdminGuestbookController::class, 'uploadForm'])->name('guestbook.upload.form');
+        Route::post('/guestbook/upload', [AdminGuestbookController::class, 'upload'])->name('guestbook.upload');
+    });
+});

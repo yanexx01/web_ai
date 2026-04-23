@@ -11,15 +11,33 @@ class GuestbookController extends Controller
     /**
      * Отображение страницы гостевой книги в админке
      */
-    public function index()
+    public function index(Request $request)
     {
-        // Получаем все сообщения из БД, отсортированные по убыванию даты
-        $messages = Guestbook::orderBy('created_at', 'desc')->get();
+        // Получаем номер страницы
+        $page = $request->input('page', 1);
+        
+        // Получаем общее количество записей
+        $totalItems = Guestbook::count();
+        
+        // Рассчитываем общее количество страниц
+        $totalPages = $totalItems > 0 ? ceil($totalItems / 10) : 1;
+        
+        // Ограничиваем номер страницы допустимым диапазоном
+        $page = max(1, min($page, $totalPages));
+        
+        // Получаем сообщения из БД с пагинацией и сортировкой по убыванию даты
+        $messages = Guestbook::orderBy('created_at', 'desc')
+            ->offset(($page - 1) * 10)
+            ->limit(10)
+            ->get();
 
         return view('admin.guestbook.index', [
             'pageTitle' => 'Управление гостевой книгой',
             'pageName' => 'admin-guestbook',
-            'messages' => $messages
+            'messages' => $messages,
+            'currentPage' => $page,
+            'totalPages' => $totalPages,
+            'totalItems' => $totalItems
         ]);
     }
 
