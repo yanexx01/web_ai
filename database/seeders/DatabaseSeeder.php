@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
         // Запускаем сидер вопросов и ответов
         $this->call([
             QuestionsSeeder::class,
+            AdminUserSeeder::class,
         ]);
     }
 }
