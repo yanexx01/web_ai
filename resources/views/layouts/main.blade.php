@@ -30,6 +30,13 @@
 <header class="header">
     <button id="menu-toggle" class="menu-toggle-btn">☰</button>
     <div id="clock" class="clock-display"></div>
+    
+    <!-- Отображение информации о пользователе -->
+    @auth
+        <div class="user-info">
+            {{ Auth::user()->name }}: {{ Auth::user()->login }}
+        </div>
+    @endauth
 </header>
 
 <!-- Боковое меню -->
@@ -44,6 +51,19 @@
         <li><a href="/test" class="menu-item" data-page="test">Тест</a></li>
         <li><a href="/guestbook" class="menu-item" data-page="guestbook">Гостевая книга</a></li>
         <li><a href="/blog" class="menu-item" data-page="blog">Блог</a></li>
+        
+        <!-- Ссылки авторизации -->
+        @guest
+            <li><a href="{{ route('login') }}" class="menu-item" data-page="login">Войти</a></li>
+            <li><a href="{{ route('register') }}" class="menu-item" data-page="register">Регистрация</a></li>
+        @else
+            <li>
+                <form method="POST" action="{{ route('logout') }}" style="display: inline;">
+                    @csrf
+                    <button type="submit" class="menu-item logout-btn">Выйти</button>
+                </form>
+            </li>
+        @endguest
     </ul>
 </nav>
 

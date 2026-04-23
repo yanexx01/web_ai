@@ -1072,3 +1072,24 @@ body {
 html {
     scroll-behavior: smooth;
 }
+/* === СТИЛИ ДЛЯ АВТОРИЗАЦИИ === */
+.user-info {
+    color: #fff;
+    font-size: 14px;
+    padding: 0 15px;
+}
+
+.logout-btn {
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 8px 12px;
+    transition: background 0.3s;
+}
+
+.logout-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}

@@ -5,6 +5,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\GuestbookController;
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,3 +37,12 @@ Route::post('/blog/store', [BlogController::class, 'store'])->name('blog.store.a
 // Загрузка CSV в блог
 Route::get('/blog/upload', [BlogController::class, 'showUploadForm'])->name('blog.upload.form');
 Route::post('/blog/upload', [BlogController::class, 'uploadCsv'])->name('blog.upload');
+
+// Маршруты аутентификации
+Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register');
+Route::post('/register', [AuthController::class, 'register']);
+
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
