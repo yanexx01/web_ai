@@ -41,7 +41,7 @@
                 <tr>
                     <td>{{ $blog->id }}</td>
                     <td>{{ $blog->topic }}</td>
-                    <td>{{ $blog->created_at->format('d.m.Y H:i') }}</td>
+                    <td>{{ is_string($blog->created_at) ? \Carbon\Carbon::parse($blog->created_at)->format('d.m.Y H:i') : $blog->created_at->format('d.m.Y H:i') }}</td>
                     <td>
                         @if($blog->image)
                             <img src="/storage/{{ $blog->image }}" alt="Изображение" style="max-width: 100px; max-height: 50px; object-fit: cover;">
