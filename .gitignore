@@ -1,40 +1,31 @@
 ```
-# Compiled and build artifacts
-*.pyc
-__pycache__/
-*.o
-*.obj
-dist/
-build/
-target/
-
-# Dependencies
-.venv/
-venv/
+# Dependency directories
 node_modules/
-.mypy_cache/
-.pytest_cache/
-.gradle/
 vendor/
 
-# Logs and temp files
+# Laravel specific
+bootstrap/cache/
+storage/framework/cache/
+storage/framework/sessions/
+storage/framework/views/
+public/storage/
+
+# Logs
 *.log
-*.tmp
-*.swp
-*.swo
+storage/logs/
 
 # Environment
 .env
 .env.local
 .env.*
 
-# Editors
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
 
-# OS specific
+# OS
 .DS_Store
 Thumbs.db
 
@@ -42,6 +33,32 @@ Thumbs.db
 coverage/
 htmlcov/
 .coverage
+
+# Build artifacts
+dist/
+build/
+target/
+*.exe
+*.dll
+*.so
+*.a
+*.o
+*.obj
+*.out
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+.Python
+*.egg-info/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.tox/
 
 # Compressed files
 *.zip
@@ -62,4 +79,8 @@ htmlcov/
 *.Z
 *.lz
 *.lzo
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
 ```
