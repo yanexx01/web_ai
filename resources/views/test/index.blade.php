@@ -8,8 +8,12 @@
         {!! $errorsHtml !!}
     @endif
 
-    @if (!empty($resultHtml))
-        {!! $resultHtml !!}
+    @if (session('test_result'))
+        <div class='alert alert-success'>
+            <h3>Результат теста</h3>
+            <p>Ваш счет: <strong>{{ session('test_result.score') }}</strong> из {{ session('test_result.total') }}</p>
+            <p>Результат: <strong>{{ session('test_result.isCorrectText') }}</strong></p>
+        </div>
     @endif
 
     <form action="" method="post">
