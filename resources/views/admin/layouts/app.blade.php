@@ -191,6 +191,7 @@
                 <li><a href="{{ route('admin.blog.upload.form') }}" class="{{ $pageName === 'admin-blog-upload' ? 'active' : '' }}">📤 Загрузка CSV</a></li>
                 <li><a href="{{ route('admin.guestbook.index') }}" class="{{ $pageName === 'admin-guestbook' ? 'active' : '' }}">📖 Гостевая книга</a></li>
                 <li><a href="{{ route('admin.guestbook.upload.form') }}" class="{{ $pageName === 'admin-guestbook-upload' ? 'active' : '' }}">📥 Импорт сообщений</a></li>
+                <li><a href="{{ route('admin.stats.index') }}" class="{{ $pageName === 'admin-stats' ? 'active' : '' }}">📊 Статистика посещений</a></li>
                 <li><a href="/">🏠 На сайт</a></li>
             </ul>
         </nav>
