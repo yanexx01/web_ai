@@ -255,7 +255,7 @@ class BlogController extends Controller
         $blog->message = $request->input('message');
 
         // Если пользователь хочет удалить изображение
-        if ($request->input('remove_image') == '1') {
+        if ($request->input('remove_photo') == '1') {
             if ($blog->image) {
                 $oldImagePath = storage_path('app/public/' . $blog->image);
                 if (file_exists($oldImagePath)) {
