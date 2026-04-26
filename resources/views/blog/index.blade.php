@@ -42,6 +42,25 @@
                         <div class="blog-message">
                             {!! nl2br(e($post->message ?? '')) !!}
                         </div>
+                        
+                        <!-- Кнопка добавления комментария (только для авторизированных) -->
+                        @auth
+                            <button type="button" class="btn-add-comment" onclick="openCommentModal({{ $post->id }})">
+                                💬 Добавить комментарий
+                            </button>
+
+                            <!-- Контейнер для комментариев -->
+                            <div class="comments-section" id="comments-{{ $post->id }}">
+                                <h3 class="comments-title">Комментарии</h3>
+                                <div class="comments-list" id="comments-list-{{ $post->id }}">
+                                    <!-- Комментарии будут загружены здесь -->
+                                </div>
+                            </div>
+                        @else
+                            <p class="login-prompt">
+                                <a href="{{ route('login') }}">Войдите</a>, чтобы оставить комментарий.
+                            </p>
+                        @endauth
                     </div>
                 </article>
             @endforeach
@@ -107,6 +126,34 @@
         </div>
         <div class="modal-body">
             <img id="blogModalImage" src="" alt="">
+        </div>
+    </div>
+</div>
+
+{{-- Модальное окно для добавления комментария --}}
+<div id="commentModal" class="modal-overlay comment-modal-overlay" onclick="closeCommentModal(event)">
+    <div class="modal-container comment-modal-container" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3>Добавить комментарий</h3>
+            <button class="modal-close-btn" onclick="closeCommentModal(event)">&times;</button>
+        </div>
+        <div class="modal-body comment-modal-body">
+            <form id="commentForm" onsubmit="submitComment(event)">
+                <input type="hidden" id="commentBlogId" name="blog_id" value="">
+                <textarea
+                    id="commentContent"
+                    name="content"
+                    placeholder="Введите ваш комментарий..."
+                    rows="4"
+                    required
+                    minlength="1"
+                    maxlength="1000"
+                ></textarea>
+                <div class="comment-form-actions">
+                    <span id="commentError" class="comment-error"></span>
+                    <button type="submit" class="btn-submit btn-comment-submit">Отправить</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -244,6 +291,139 @@
         display: block;
     }
 
+    /* Стили для модального окна комментариев */
+    .comment-modal-overlay {
+        z-index: 10000;
+    }
+
+    .comment-modal-container {
+        max-width: 500px;
+        max-height: 80vh;
+    }
+
+    .comment-modal-body {
+        padding: 20px;
+        display: block;
+    }
+
+    #commentForm textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #444;
+        border-radius: 6px;
+        background: #333;
+        color: #fff;
+        font-size: 1rem;
+        resize: vertical;
+        box-sizing: border-box;
+    }
+
+    #commentForm textarea:focus {
+        outline: none;
+        border-color: #666;
+    }
+
+    .comment-form-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 15px;
+        align-items: flex-end;
+    }
+
+    .comment-error {
+        color: #ff6b6b;
+        font-size: 0.9rem;
+        min-height: 20px;
+    }
+
+    .btn-comment-submit {
+        min-width: 120px;
+    }
+
+    /* Стили для кнопки добавления комментария */
+    .btn-add-comment {
+        display: inline-block;
+        margin-top: 15px;
+        padding: 10px 20px;
+        background: #4a90d9;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.95rem;
+        transition: background 0.3s;
+    }
+
+    .btn-add-comment:hover {
+        background: #357abd;
+    }
+
+    /* Секция комментариев */
+    .comments-section {
+        margin-top: 25px;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+    }
+
+    .comments-title {
+        font-size: 1.2rem;
+        color: #333;
+        margin-bottom: 15px;
+    }
+
+    .comments-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .comment-item {
+        background: #f9f9f9;
+        border-radius: 8px;
+        padding: 15px;
+        border-left: 3px solid #4a90d9;
+    }
+
+    .comment-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-size: 0.9rem;
+    }
+
+    .comment-author {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .comment-date {
+        color: #888;
+        font-style: italic;
+    }
+
+    .comment-content {
+        color: #444;
+        line-height: 1.5;
+        word-wrap: break-word;
+    }
+
+    .login-prompt {
+        margin-top: 15px;
+        color: #666;
+        font-style: italic;
+    }
+
+    .login-prompt a {
+        color: #4a90d9;
+        text-decoration: none;
+    }
+
+    .login-prompt a:hover {
+        text-decoration: underline;
+    }
+
+
     @media (max-width: 600px) {
         .modal-container {
             max-width: 100vw;
@@ -298,5 +478,131 @@
     document.addEventListener('keydown', (e) => { 
         if (e.key === 'Escape') closeBlogModal(); 
     });
+
+    
+    // Функции для работы с комментариями (Fetch API + HTML)
+
+    // Открытие модального окна для добавления комментария
+    function openCommentModal(blogId) {
+        document.getElementById('commentBlogId').value = blogId;
+        document.getElementById('commentContent').value = '';
+        document.getElementById('commentError').textContent = '';
+
+        const modal = document.getElementById('commentModal');
+        modal.style.display = 'flex';
+
+        setTimeout(() => {
+            modal.classList.add('show');
+        }, 10);
+
+        document.body.style.overflow = 'hidden';
+        document.getElementById('commentContent').focus();
+    }
+
+    // Закрытие модального окна комментариев
+    function closeCommentModal(event) {
+        if (event && event.target !== event.currentTarget) return;
+
+        const modal = document.getElementById('commentModal');
+        modal.classList.remove('show');
+
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
+
+        document.body.style.overflow = '';
+    }
+
+    // Отправка комментария через Fetch API
+    function submitComment(event) {
+        event.preventDefault();
+
+        const blogId = document.getElementById('commentBlogId').value;
+        const content = document.getElementById('commentContent').value.trim();
+        const errorEl = document.getElementById('commentError');
+
+        if (!content) {
+            errorEl.textContent = 'Введите текст комментария';
+            return;
+        }
+
+        // Получаем CSRF-токен из meta-тега
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+
+        // Отправляем данные через Fetch API (требование задания)
+        fetch('/comments', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'text/html'
+            },
+            body: JSON.stringify({
+                blog_id: blogId,
+                content: content
+            })
+        })
+        .then(response => {
+            if (response.status === 401) {
+                throw new Error('Требуется авторизация');
+            }
+            if (!response.ok) {
+                return response.text().then(text => { throw new Error(text || 'Ошибка отправки'); });
+            }
+            return response.text();
+        })
+        .then(html => {
+            // Вставляем полученный HTML с комментарием в список
+            const commentsList = document.getElementById('comments-list-' + blogId);
+            if (commentsList) {
+                commentsList.insertAdjacentHTML('beforeend', html);
+            }
+
+            // Закрываем модальное окно
+            closeCommentModal();
+
+            // Очищаем поле ввода
+            document.getElementById('commentContent').value = '';
+            errorEl.textContent = '';
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+            errorEl.textContent = error.message || 'Ошибка при отправке комментария';
+        });
+    }
+
+    // Загрузка существующих комментариев при загрузке страницы
+    document.addEventListener('DOMContentLoaded', function() {
+        @auth
+            const commentSections = document.querySelectorAll('.comments-section');
+            commentSections.forEach(section => {
+                const blogId = section.id.replace('comments-', '');
+                loadComments(blogId);
+            });
+        @endauth
+    });
+
+    // Загрузка комментариев для записи блога
+    function loadComments(blogId) {
+        fetch('/blog/' + blogId + '/comments', {
+            method: 'GET',
+            headers: {
+                'Accept': 'text/html'
+            }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Ошибка загрузки комментариев');
+            return response.text();
+        })
+        .then(html => {
+            const commentsList = document.getElementById('comments-list-' + blogId);
+            if (commentsList) {
+                commentsList.innerHTML = html || '<p style="color:#888;font-style:italic;">Комментариев пока нет</p>';
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка загрузки комментариев:', error);
+        });
+    }
 </script>
 @endsection
