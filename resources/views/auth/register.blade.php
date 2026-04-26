@@ -18,22 +18,22 @@
         @csrf
 
         <div class="form-group">
-            <label for="name">ФИО пользователя</label>
+            <label for="name">ФИО</label>
             <input type="text" id="name" name="name" value="{{ old('name') }}" required autofocus>
         </div>
 
         <div class="form-group">
-            <label for="email">E-mail пользователя</label>
+            <label for="email">E-mail</label>
             <input type="email" id="email" name="email" value="{{ old('email') }}" required>
         </div>
 
         <div class="form-group">
-            <label for="login">Логин пользователя</label>
+            <label for="login">Логин</label>
             <input type="text" id="login" name="login" value="{{ old('login') }}" required>
         </div>
 
         <div class="form-group">
-            <label for="password">Пароль пользователя</label>
+            <label for="password">Пароль</label>
             <input type="password" id="password" name="password" required>
         </div>
 
