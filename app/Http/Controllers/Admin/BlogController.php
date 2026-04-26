@@ -240,15 +240,25 @@ class BlogController extends Controller
         $blog = Blog::findOrFail($id);
 
         // Валидация данных
-        $validator = $request->validate([
-            'topic' => 'required|string|max:255',
-            'image' => 'nullable|file|mimes:jpg,jpeg,png,gif,webp|max:10240',
-            'message' => 'required|string',
-        ], [
-            'image.max' => 'Размер изображения не должен превышать 10MB. Пожалуйста, выберите изображение меньшего размера.',
-            'image.mimes' => 'Неверный формат изображения. Допустимые форматы: jpg, jpeg, png, gif, webp.',
-            'image.file' => 'Файл изображения поврежден или не может быть загружен.',
-        ]);
+        try {
+            $validator = $request->validate([
+                'topic' => 'required|string|max:255',
+                'image' => 'nullable|file|mimes:jpg,jpeg,png,gif,webp|max:10240',
+                'message' => 'required|string',
+            ], [
+                'image.max' => 'Размер изображения не должен превышать 10MB. Пожалуйста, выберите изображение меньшего размера.',
+                'image.mimes' => 'Неверный формат изображения. Допустимые форматы: jpg, jpeg, png, gif, webp.',
+                'image.file' => 'Файл изображения поврежден или не может быть загружен.',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->view('admin.blog.iframe-response', [
+                'jsonResponse' => [
+                    'success' => false,
+                    'errors' => $e->errors()
+                ],
+                'responseType' => 'blog-edit-response'
+            ])->header('Content-Type', 'text/html');
+        }
 
         // Обновляем данные
         $blog->topic = $request->input('topic');
@@ -270,10 +280,13 @@ class BlogController extends Controller
             $image = $request->file('image');
 
             if (!$image->isValid()) {
-                return response()->json([
-                    'success' => false,
-                    'errors' => ['image' => ['Ошибка при загрузке файла. Попробуйте еще раз.']]
-                ], 422);
+                return response()->view('admin.blog.iframe-response', [
+                    'jsonResponse' => [
+                        'success' => false,
+                        'errors' => ['image' => ['Ошибка при загрузке файла. Попробуйте еще раз.']]
+                    ],
+                    'responseType' => 'blog-edit-response'
+                ])->header('Content-Type', 'text/html');
             }
 
             // Удаляем старое изображение, если оно существует и не было удалено выше
@@ -291,23 +304,29 @@ class BlogController extends Controller
                 $imagePath = $image->storeAs('blog_images', $imageName, 'public');
                 $blog->image = $imagePath;
             } catch (\Exception $e) {
-                return response()->json([
-                    'success' => false,
-                    'errors' => ['image' => ['Не удалось сохранить изображение: ' . $e->getMessage()]]
-                ], 422);
+                return response()->view('admin.blog.iframe-response', [
+                    'jsonResponse' => [
+                        'success' => false,
+                        'errors' => ['image' => ['Не удалось сохранить изображение: ' . $e->getMessage()]]
+                    ],
+                    'responseType' => 'blog-edit-response'
+                ])->header('Content-Type', 'text/html');
             }
         }
 
         $blog->save();
 
-        // Возвращаем JSON ответ для iFrame
-        return response()->json([
-            'success' => true,
-            'id' => $blog->id,
-            'topic' => $blog->topic,
-            'message' => $blog->message,
-            'image' => $blog->image
-        ]);
+        // Возвращаем HTML ответ для iFrame с пост-сообщением родительскому окну
+        return response()->view('admin.blog.iframe-response', [
+            'jsonResponse' => [
+                'success' => true,
+                'id' => $blog->id,
+                'topic' => $blog->topic,
+                'message' => $blog->message,
+                'image' => $blog->image
+            ],
+            'responseType' => 'blog-edit-response'
+        ])->header('Content-Type', 'text/html');
     }
 
     /**

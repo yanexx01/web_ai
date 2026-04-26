@@ -43,13 +43,13 @@
                 <div style="margin-bottom: 10px; display: flex; gap: 10px; flex-wrap: wrap;">
                     <button type="button" id="removePhotoBtn" class="admin-btn" style="background-color: #e74c3c;" onclick="removeCurrentPhoto()">🗑️ Удалить фото</button>
                     <button type="button" id="changePhotoBtn" class="admin-btn" style="background-color: #f39c12;" onclick="changePhoto()">✏️ Изменить фото</button>
-                    <button type="button" id="cancelRemoveBtn" class="admin-btn" style="background-color: #95a5a6; display: none;" onclick="cancelRemovePhoto()">❌ Отменить удаление</button>
+                    {{-- <button type="button" id="cancelRemoveBtn" class="admin-btn" style="background-color: #95a5a6; display: none;" onclick="cancelRemovePhoto()">❌ Отменить удаление</button> --}}
                 </div>
             @endif
             <input type="file"
                    id="image"
                    name="image"
-                   accept="image/*"
+                   accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
                    class="admin-input"
                    onchange="previewImage(this)"
                    style="@if(!$blog->image) display: block; @else display: none; @endif">
@@ -112,33 +112,29 @@ function previewImage(input) {
     }
 }
 
-// Удаление текущего фото
+// Удаление текущего фото с подтверждением
 function removeCurrentPhoto() {
-    const currentImage = document.getElementById('currentImage');
-    const imageInput = document.getElementById('image');
-    const preview = document.getElementById('imagePreview');
-    const cancelRemoveBtn = document.getElementById('cancelRemoveBtn');
-    
-    if (currentImage) {
-        currentImage.style.display = 'none';
+    if (confirm('Вы уверены, что хотите удалить фото? Это действие нельзя отменить.')) {
+        const currentImage = document.getElementById('currentImage');
+        const imageInput = document.getElementById('image');
+        const preview = document.getElementById('imagePreview');
+
+        if (currentImage) {
+            currentImage.style.display = 'none';
+        }
+
+        // Очищаем превью, если оно было
+        preview.innerHTML = '';
+
+        // Показываем инпут для загрузки нового изображения
+        imageInput.style.display = 'block';
+        imageInput.value = ''; // Сбрасываем значение инпута
+
+        // Устанавливаем флаг удаления в скрытый инпут формы
+        shouldRemovePhoto = true;
+        hasNewPhoto = false;
+        document.getElementById('removePhotoInput').value = '1';
     }
-    
-    // Очищаем превью, если оно было
-    preview.innerHTML = '';
-    
-    // Показываем инпут для загрузки нового изображения
-    imageInput.style.display = 'block';
-    imageInput.value = ''; // Сбрасываем значение инпута
-    
-    // Показываем кнопку отмены удаления
-    if (cancelRemoveBtn) {
-        cancelRemoveBtn.style.display = 'inline-block';
-    }
-    
-    // Устанавливаем флаг удаления в скрытый инпут формы
-    shouldRemovePhoto = true;
-    hasNewPhoto = false;
-    document.getElementById('removePhotoInput').value = '1';
 }
 
 // Изменение текущего фото
@@ -149,30 +145,6 @@ function changePhoto() {
     imageInput.click();
 }
 
-// Отмена удаления фото - показать снова текущее
-function cancelRemovePhoto() {
-    const currentImage = document.getElementById('currentImage');
-    const imageInput = document.getElementById('image');
-    const preview = document.getElementById('imagePreview');
-    const cancelRemoveBtn = document.getElementById('cancelRemoveBtn');
-    
-    if (currentImage) {
-        currentImage.style.display = 'block';
-    }
-    
-    preview.innerHTML = '';
-    imageInput.style.display = 'none';
-    imageInput.value = '';
-    
-    // Скрываем кнопку отмены удаления
-    if (cancelRemoveBtn) {
-        cancelRemoveBtn.style.display = 'none';
-    }
-    
-    shouldRemovePhoto = false;
-    hasNewPhoto = false;
-    document.getElementById('removePhotoInput').value = '0';
-}
 
 let isSubmitting = false;
 
@@ -189,14 +161,14 @@ function handleEditResponse(data) {
         resultMessage.innerHTML = '<div class="admin-success">✅ Запись успешно обновлена!</div>';
 
         // Обновляем данные в таблице на родительской странице
-        if (window.opener && !window.opener.closed) {
-            window.opener.updateBlogRow(data);
+        if (window.parent && window.parent.updateBlogRow) {
+            window.parent.updateBlogRow(data);
         }
 
-        // Через 2 секунды возвращаемся к списку блогов
+        // Через 1.5 секунды закрываем модальное окно
         setTimeout(function() {
-            if (window.opener && !window.opener.closed) {
-                window.close();
+            if (window.parent && window.parent.closeEditWindow) {
+                window.parent.closeEditWindow();
             } else {
                 window.location.href = '{{ route("admin.blog.index") }}';
             }
@@ -223,7 +195,7 @@ function handleEditResponse(data) {
             const currentImage = document.getElementById('currentImage');
             const imageInput = document.getElementById('image');
             const preview = document.getElementById('imagePreview');
-            const cancelRemoveBtn = document.getElementById('cancelRemoveBtn');
+            // const cancelRemoveBtn = document.getElementById('cancelRemoveBtn');
             
             if (currentImage) {
                 currentImage.style.display = 'block';
@@ -231,9 +203,9 @@ function handleEditResponse(data) {
             preview.innerHTML = '';
             imageInput.style.display = 'none';
             imageInput.value = '';
-            if (cancelRemoveBtn) {
-                cancelRemoveBtn.style.display = 'none';
-            }
+            // if (cancelRemoveBtn) {
+            //     cancelRemoveBtn.style.display = 'none';
+            // }
             shouldRemovePhoto = false;
             hasNewPhoto = false;
             document.getElementById('removePhotoInput').value = '0';
@@ -241,21 +213,17 @@ function handleEditResponse(data) {
     }
 }
 
-// Обработчик загрузки iFrame (для обработки случаев, когда ответ не пришел)
+// Обработчик загрузки iFrame - теперь просто игнорируем, так как ответ обрабатывается через postMessage
 function handleFrameLoad() {
-    if (isSubmitting) {
-        // Если форма была отправлена, но ответ еще не обработан
-        // Ждем вызова handleEditResponse из скрипта в ответе сервера
-        setTimeout(function() {
-            if (isSubmitting) {
-                document.getElementById('loadingIndicator').style.display = 'none';
-                document.getElementById('resultMessage').innerHTML =
-                    '<div class="admin-error">⚠️ Произошла ошибка при сохранении. Попробуйте еще раз.</div>';
-                isSubmitting = false;
-            }
-        }, 5000); // Таймаут 5 секунд
-    }
+    // Пустая функция - больше не показываем ошибку по таймауту
 }
+
+// Слушаем сообщения от iFrame с ответом сервера
+window.addEventListener('message', function(event) {
+    if (event.data && event.data.type === 'blog-edit-response') {
+        handleEditResponse(event.data.data);
+    }
+});
 
 // Отправка формы с показом индикатора загрузки
 document.getElementById('editForm').addEventListener('submit', function(e) {
