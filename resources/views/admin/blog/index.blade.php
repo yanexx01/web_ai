@@ -53,6 +53,12 @@
                     <td>
                         <!-- Кнопка "Изменить" (требование задания 3) -->
                         <button onclick="openEditWindow({{ $blog->id }})" class="admin-btn" style="padding: 6px 12px; font-size: 13px;">✏️ Изменить</button>
+                        <!-- Кнопка "Удалить" -->
+                        <form action="{{ route('admin.blog.destroy', $blog->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Вы уверены, что хотите удалить эту запись?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="admin-btn" style="padding: 6px 12px; font-size: 13px; background-color: #e74c3c;">🗑️ Удалить</button>
+                        </form>
                     </td>
                 </tr>
                 @endforeach
@@ -137,9 +143,17 @@ function updateBlogRow(data) {
             topicCell.textContent = data.topic;
         }
 
-        // Подсветка обновленной строки
+        // Обновляем изображение, если оно изменилось
         const row = document.getElementById(`blog-row-${data.id}`);
         if (row) {
+            const imageCell = row.querySelector('td:nth-child(4)');
+            if (imageCell && data.image) {
+                imageCell.innerHTML = '<img src="/storage/' + data.image + '" alt="Изображение" style="max-width: 100px; max-height: 50px; object-fit: cover;">';
+            } else if (imageCell && !data.image) {
+                imageCell.innerHTML = '<span style="color: #95a5a6;">Нет</span>';
+            }
+
+            // Подсветка обновленной строки
             row.style.backgroundColor = '#d4edda';
             setTimeout(() => {
                 row.style.backgroundColor = '';

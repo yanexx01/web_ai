@@ -217,4 +217,108 @@ class BlogController extends Controller
         return redirect('/admin/blog')
             ->with('success', "Успешно загружено записей: {$successCount}");
     }
+
+    /**
+     * Отображение формы редактирования записи блога
+     */
+    public function edit($id)
+    {
+        $blog = Blog::findOrFail($id);
+
+        return view('admin.blog.edit', [
+            'pageTitle' => 'Редактирование записи',
+            'pageName' => 'admin-blog',
+            'blog' => $blog
+        ]);
+    }
+
+    /**
+     * Обработка формы обновления записи блога
+     */
+    public function update(Request $request, $id)
+    {
+        $blog = Blog::findOrFail($id);
+
+        // Валидация данных
+        $validator = $request->validate([
+            'topic' => 'required|string|max:255',
+            'image' => 'nullable|file|mimes:jpg,jpeg,png,gif,webp|max:10240',
+            'message' => 'required|string',
+        ], [
+            'image.max' => 'Размер изображения не должен превышать 10MB. Пожалуйста, выберите изображение меньшего размера.',
+            'image.mimes' => 'Неверный формат изображения. Допустимые форматы: jpg, jpeg, png, gif, webp.',
+            'image.file' => 'Файл изображения поврежден или не может быть загружен.',
+        ]);
+
+        // Обновляем данные
+        $blog->topic = $request->input('topic');
+        $blog->message = $request->input('message');
+
+        // Обработка загрузки нового изображения
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+
+            if (!$image->isValid()) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => ['image' => ['Ошибка при загрузке файла. Попробуйте еще раз.']]
+                ], 422);
+            }
+
+            // Удаляем старое изображение, если оно существует
+            if ($blog->image && file_exists(storage_path('app/public/' . $blog->image))) {
+                unlink(storage_path('app/public/' . $blog->image));
+            }
+
+            // Генерируем уникальное имя файла
+            $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+
+            try {
+                $imagePath = $image->storeAs('blog_images', $imageName, 'public');
+                $blog->image = $imagePath;
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => ['image' => ['Не удалось сохранить изображение: ' . $e->getMessage()]]
+                ], 422);
+            }
+        }
+
+        // Если пользователь хочет удалить изображение
+        if ($request->input('remove_image') == '1') {
+            if ($blog->image && file_exists(storage_path('app/public/' . $blog->image))) {
+                unlink(storage_path('app/public/' . $blog->image));
+            }
+            $blog->image = null;
+        }
+
+        $blog->save();
+
+        // Возвращаем JSON ответ для iFrame
+        return response()->json([
+            'success' => true,
+            'id' => $blog->id,
+            'topic' => $blog->topic,
+            'message' => $blog->message,
+            'image' => $blog->image
+        ]);
+    }
+
+    /**
+     * Удаление записи блога
+     */
+    public function destroy($id)
+    {
+        $blog = Blog::findOrFail($id);
+
+        // Удаляем изображение, если оно существует
+        if ($blog->image && file_exists(storage_path('app/public/' . $blog->image))) {
+            unlink(storage_path('app/public/' . $blog->image));
+        }
+
+        $blog->delete();
+
+        return redirect('/admin/blog')->with('success', 'Запись успешно удалена!');
+    }
+
 }

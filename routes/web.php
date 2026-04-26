@@ -92,6 +92,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Редактирование записей блога (iFrame + JSON)
         Route::get('/blog/{id}/edit', [AdminBlogController::class, 'edit'])->name('blog.edit');
         Route::put('/blog/{id}', [AdminBlogController::class, 'update'])->name('blog.update');
+        Route::delete('/blog/{id}', [AdminBlogController::class, 'destroy'])->name('blog.destroy');
 
         // Гостевая книга
         Route::get('/guestbook', [AdminGuestbookController::class, 'index'])->name('guestbook.index');

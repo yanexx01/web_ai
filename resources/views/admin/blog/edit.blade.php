@@ -5,8 +5,7 @@
     <h2 style="margin-top: 0;">✏️ Редактирование записи блога</h2>
 
     <!-- Форма отправляется на скрытый iFrame -->
-    <form id="editForm" action="{{ route('admin.blog.update', $blog->id) }}" method="POST" target="editFrame">
-        @csrf
+    <form id="editForm" action="{{ route('admin.blog.update', $blog->id) }}" method="POST" enctype="multipart/form-data" target="editFrame">        @csrf
         @method('PUT')
 
         <div class="form-group">
@@ -26,6 +25,30 @@
                       rows="10"
                       required
                       class="admin-input">{{ old('message', $blog->message) }}</textarea>
+        </div>
+
+        
+        <div class="form-group">
+            <label for="image">Изображение:</label>
+            @if($blog->image)
+                <div style="margin-bottom: 10px;">
+                    <img src="/storage/{{ $blog->image }}" alt="Текущее изображение" style="max-width: 300px; max-height: 200px; object-fit: cover; border-radius: 6px;">
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <label style="display: inline-flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" name="remove_image" value="1" id="removeImage" style="width: auto;">
+                        <span>Удалить текущее изображение</span>
+                    </label>
+                </div>
+            @endif
+            <input type="file"
+                   id="image"
+                   name="image"
+                   accept="image/*"
+                   class="admin-input"
+                   onchange="previewImage(this)">
+            <small style="color: #7f8c8d;">Допустимые форматы: jpg, jpeg, png, gif, webp. Максимальный размер: 10MB</small>
+            <div id="imagePreview" style="margin-top: 10px;"></div>
         </div>
 
         <div class="form-actions">
@@ -49,6 +72,25 @@
 </div>
 
 <script>
+function previewImage(input) {
+    const preview = document.getElementById('imagePreview');
+    const removeCheckbox = document.getElementById('removeImage');
+
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.innerHTML = '<img src="' + e.target.result + '" alt="Предпросмотр" style="max-width: 300px; max-height: 200px; object-fit: cover; border-radius: 6px;">';
+        };
+        reader.readAsDataURL(input.files[0]);
+
+        // Снимаем галочку удаления при выборе нового файла
+        if (removeCheckbox) {
+            removeCheckbox.checked = false;
+        }
+    } else {
+        preview.innerHTML = '';
+    }
+}
 let isSubmitting = false;
 
 // Функция, вызываемая из родительского окна после получения ответа от сервера
