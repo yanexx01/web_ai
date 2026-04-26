@@ -7,6 +7,7 @@
     <!-- Форма отправляется на скрытый iFrame -->
     <form id="editForm" action="{{ route('admin.blog.update', $blog->id) }}" method="POST" enctype="multipart/form-data" target="editFrame">        @csrf
         @method('PUT')
+        <input type="hidden" name="remove_photo" id="removePhotoInput" value="0">
 
         <div class="form-group">
             <label for="topic">Тема записи:</label>
@@ -32,13 +33,17 @@
             <label for="image">Изображение:</label>
             @if($blog->image)
                 <div style="margin-bottom: 10px;">
-                    <img src="/storage/{{ $blog->image }}" alt="Текущее изображение" style="max-width: 300px; max-height: 200px; object-fit: cover; border-radius: 6px;">
+                    <img id="currentImage" 
+                         src="/storage/{{ $blog->image }}" 
+                         alt="Текущее изображение" 
+                         style="max-width: 300px; max-height: 200px; object-fit: cover; border-radius: 6px;"
+                         data-src="/storage/{{ $blog->image }}">
                 </div>
-                <div style="margin-bottom: 10px;">
-                    <label style="display: inline-flex; align-items: center; gap: 8px; cursor: pointer;">
-                        <input type="checkbox" name="remove_image" value="1" id="removeImage" style="width: auto;">
-                        <span>Удалить текущее изображение</span>
-                    </label>
+                <input type="hidden" id="currentImagePath" value="{{ $blog->image }}">
+                <div style="margin-bottom: 10px; display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button type="button" id="removePhotoBtn" class="admin-btn" style="background-color: #e74c3c;" onclick="removeCurrentPhoto()">🗑️ Удалить фото</button>
+                    <button type="button" id="changePhotoBtn" class="admin-btn" style="background-color: #f39c12;" onclick="changePhoto()">✏️ Изменить фото</button>
+                    <button type="button" id="cancelRemoveBtn" class="admin-btn" style="background-color: #95a5a6; display: none;" onclick="cancelRemovePhoto()">❌ Отменить удаление</button>
                 </div>
             @endif
             <input type="file"
@@ -46,7 +51,8 @@
                    name="image"
                    accept="image/*"
                    class="admin-input"
-                   onchange="previewImage(this)">
+                   onchange="previewImage(this)"
+                   style="@if(!$blog->image) display: block; @else display: none; @endif">
             <small style="color: #7f8c8d;">Допустимые форматы: jpg, jpeg, png, gif, webp. Максимальный размер: 10MB</small>
             <div id="imagePreview" style="margin-top: 10px;"></div>
         </div>
@@ -72,25 +78,102 @@
 </div>
 
 <script>
+// Флаг для удаления текущего фото
+let shouldRemovePhoto = false;
+let hasNewPhoto = false;
+
 function previewImage(input) {
     const preview = document.getElementById('imagePreview');
-    const removeCheckbox = document.getElementById('removeImage');
+    const currentImage = document.getElementById('currentImage');
+    const removePhotoBtn = document.getElementById('removePhotoBtn');
+    const changePhotoBtn = document.getElementById('changePhotoBtn');
+    const imageInput = document.getElementById('image');
 
     if (input.files && input.files[0]) {
         const reader = new FileReader();
         reader.onload = function(e) {
+            // Скрываем текущее изображение, если оно есть
+            if (currentImage) {
+                currentImage.style.display = 'none';
+            }
+            // Показываем превью нового изображения
             preview.innerHTML = '<img src="' + e.target.result + '" alt="Предпросмотр" style="max-width: 300px; max-height: 200px; object-fit: cover; border-radius: 6px;">';
+            
+            // Помечаем, что есть новое фото для загрузки
+            hasNewPhoto = true;
+            
+            // Сбрасываем флаг удаления, так как пользователь выбрал новый файл
+            shouldRemovePhoto = false;
+            document.getElementById('removePhotoInput').value = '0';
         };
         reader.readAsDataURL(input.files[0]);
-
-        // Снимаем галочку удаления при выборе нового файла
-        if (removeCheckbox) {
-            removeCheckbox.checked = false;
-        }
     } else {
         preview.innerHTML = '';
     }
 }
+
+// Удаление текущего фото
+function removeCurrentPhoto() {
+    const currentImage = document.getElementById('currentImage');
+    const imageInput = document.getElementById('image');
+    const preview = document.getElementById('imagePreview');
+    const cancelRemoveBtn = document.getElementById('cancelRemoveBtn');
+    
+    if (currentImage) {
+        currentImage.style.display = 'none';
+    }
+    
+    // Очищаем превью, если оно было
+    preview.innerHTML = '';
+    
+    // Показываем инпут для загрузки нового изображения
+    imageInput.style.display = 'block';
+    imageInput.value = ''; // Сбрасываем значение инпута
+    
+    // Показываем кнопку отмены удаления
+    if (cancelRemoveBtn) {
+        cancelRemoveBtn.style.display = 'inline-block';
+    }
+    
+    // Устанавливаем флаг удаления в скрытый инпут формы
+    shouldRemovePhoto = true;
+    hasNewPhoto = false;
+    document.getElementById('removePhotoInput').value = '1';
+}
+
+// Изменение текущего фото
+function changePhoto() {
+    const imageInput = document.getElementById('image');
+    // Сбрасываем значение инпута, чтобы можно было выбрать тот же файл повторно
+    imageInput.value = '';
+    imageInput.click();
+}
+
+// Отмена удаления фото - показать снова текущее
+function cancelRemovePhoto() {
+    const currentImage = document.getElementById('currentImage');
+    const imageInput = document.getElementById('image');
+    const preview = document.getElementById('imagePreview');
+    const cancelRemoveBtn = document.getElementById('cancelRemoveBtn');
+    
+    if (currentImage) {
+        currentImage.style.display = 'block';
+    }
+    
+    preview.innerHTML = '';
+    imageInput.style.display = 'none';
+    imageInput.value = '';
+    
+    // Скрываем кнопку отмены удаления
+    if (cancelRemoveBtn) {
+        cancelRemoveBtn.style.display = 'none';
+    }
+    
+    shouldRemovePhoto = false;
+    hasNewPhoto = false;
+    document.getElementById('removePhotoInput').value = '0';
+}
+
 let isSubmitting = false;
 
 // Функция, вызываемая из родительского окна после получения ответа от сервера
@@ -132,6 +215,29 @@ function handleEditResponse(data) {
         }
         errorsHtml += '</ul></div>';
         resultMessage.innerHTML = errorsHtml;
+        
+        // Сбрасываем состояние формы, чтобы можно было продолжить редактирование
+        // Если была попытка удалить фото, но произошла ошибка, восстанавливаем состояние
+        if (shouldRemovePhoto && data.errors) {
+            // Восстанавливаем отображение текущего фото при ошибке
+            const currentImage = document.getElementById('currentImage');
+            const imageInput = document.getElementById('image');
+            const preview = document.getElementById('imagePreview');
+            const cancelRemoveBtn = document.getElementById('cancelRemoveBtn');
+            
+            if (currentImage) {
+                currentImage.style.display = 'block';
+            }
+            preview.innerHTML = '';
+            imageInput.style.display = 'none';
+            imageInput.value = '';
+            if (cancelRemoveBtn) {
+                cancelRemoveBtn.style.display = 'none';
+            }
+            shouldRemovePhoto = false;
+            hasNewPhoto = false;
+            document.getElementById('removePhotoInput').value = '0';
+        }
     }
 }
 
