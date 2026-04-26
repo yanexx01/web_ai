@@ -254,7 +254,18 @@ class BlogController extends Controller
         $blog->topic = $request->input('topic');
         $blog->message = $request->input('message');
 
-        // Обработка загрузки нового изображения
+        // Если пользователь хочет удалить изображение
+        if ($request->input('remove_image') == '1') {
+            if ($blog->image) {
+                $oldImagePath = storage_path('app/public/' . $blog->image);
+                if (file_exists($oldImagePath)) {
+                    unlink($oldImagePath);
+                }
+            }
+            $blog->image = null;
+        }
+
+        // Обработка загрузки нового изображения (только если не было удалено)
         if ($request->hasFile('image')) {
             $image = $request->file('image');
 
@@ -265,9 +276,12 @@ class BlogController extends Controller
                 ], 422);
             }
 
-            // Удаляем старое изображение, если оно существует
-            if ($blog->image && file_exists(storage_path('app/public/' . $blog->image))) {
-                unlink(storage_path('app/public/' . $blog->image));
+            // Удаляем старое изображение, если оно существует и не было удалено выше
+            if ($blog->image) {
+                $oldImagePath = storage_path('app/public/' . $blog->image);
+                if (file_exists($oldImagePath)) {
+                    unlink($oldImagePath);
+                }
             }
 
             // Генерируем уникальное имя файла
@@ -282,14 +296,6 @@ class BlogController extends Controller
                     'errors' => ['image' => ['Не удалось сохранить изображение: ' . $e->getMessage()]]
                 ], 422);
             }
-        }
-
-        // Если пользователь хочет удалить изображение
-        if ($request->input('remove_image') == '1') {
-            if ($blog->image && file_exists(storage_path('app/public/' . $blog->image))) {
-                unlink(storage_path('app/public/' . $blog->image));
-            }
-            $blog->image = null;
         }
 
         $blog->save();
