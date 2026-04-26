@@ -216,4 +216,63 @@ class BlogController extends Controller
         return redirect('/blog')
             ->with('success', "Успешно загружено записей: {$successCount}");
     }
+
+    /**
+     * Отображение формы редактирования записи блога
+     */
+    public function edit($id)
+    {
+        $blog = Blog::findOrFail($id);
+        return view('admin.blog.edit', [
+            'pageTitle' => 'Редактировать запись',
+            'pageName' => 'admin-blog',
+            'blog' => $blog
+        ]);
+    }
+
+    /**
+     * Обновление записи блога (для iFrame, возвращает JSON в скрипте)
+     */
+    public function update(Request $request, $id)
+    {
+        $blog = Blog::findOrFail($id);
+
+        // Валидация данных
+        $validator = $request->validate([
+            'topic' => 'required|string|max:255',
+            'message' => 'required|string',
+        ]);
+
+        // Обновляем запись
+        $blog->topic = $request->input('topic');
+        $blog->message = $request->input('message');
+        $blog->save();
+
+        // Возвращаем JSON, обернутый в script для вызова в родительском окне
+        // Это требование задания: iFrame + JSON
+        $jsonData = json_encode([
+            'success' => true,
+            'id' => $blog->id,
+            'topic' => $blog->topic,
+            'message' => $blog->message,
+            'updated_at' => $blog->updated_at ?? now(),
+        ]);
+
+        return response("<script>parent.handleEditResponse({$jsonData});</script>")
+            ->header('Content-Type', 'text/html');
+    }
+
+    /**
+     * Обработка ошибки при редактировании (для iFrame)
+     */
+    public function updateError($errors)
+    {
+        $jsonData = json_encode([
+            'success' => false,
+            'errors' => $errors,
+        ]);
+
+        return response("<script>parent.handleEditResponse({$jsonData});</script>")
+            ->header('Content-Type', 'text/html');
+    }
 }

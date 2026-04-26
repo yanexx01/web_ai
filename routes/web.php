@@ -89,6 +89,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/blog/store', [AdminBlogController::class, 'store'])->name('blog.store');
         Route::get('/blog/upload', [AdminBlogController::class, 'showUploadForm'])->name('blog.upload.form');
         Route::post('/blog/upload', [AdminBlogController::class, 'uploadCsv'])->name('blog.upload');
+        // Редактирование записей блога (iFrame + JSON)
+        Route::get('/blog/{id}/edit', [AdminBlogController::class, 'edit'])->name('blog.edit');
+        Route::put('/blog/{id}', [AdminBlogController::class, 'update'])->name('blog.update');
 
         // Гостевая книга
         Route::get('/guestbook', [AdminGuestbookController::class, 'index'])->name('guestbook.index');
