@@ -49,18 +49,20 @@
                                 💬 Добавить комментарий
                             </button>
 
-                            <!-- Контейнер для комментариев -->
-                            <div class="comments-section" id="comments-{{ $post->id }}">
-                                <h3 class="comments-title">Комментарии</h3>
-                                <div class="comments-list" id="comments-list-{{ $post->id }}">
-                                    <!-- Комментарии будут загружены здесь -->
-                                </div>
-                            </div>
+
                         @else
                             <p class="login-prompt">
                                 <a href="{{ route('login') }}">Войдите</a>, чтобы оставить комментарий.
                             </p>
                         @endauth
+                        
+                        <!-- Контейнер для комментариев (виден всем) -->
+                        <div class="comments-section" id="comments-{{ $post->id }}">
+                            <h3 class="comments-title">Комментарии</h3>
+                            <div class="comments-list" id="comments-list-{{ $post->id }}">
+                                <!-- Комментарии будут загружены здесь -->
+                            </div>
+                        </div>
                     </div>
                 </article>
             @endforeach
@@ -573,13 +575,12 @@
 
     // Загрузка существующих комментариев при загрузке страницы
     document.addEventListener('DOMContentLoaded', function() {
-        @auth
-            const commentSections = document.querySelectorAll('.comments-section');
-            commentSections.forEach(section => {
-                const blogId = section.id.replace('comments-', '');
-                loadComments(blogId);
-            });
-        @endauth
+        const commentSections = document.querySelectorAll('.comments-section');
+        commentSections.forEach(section => {
+            const blogId = section.id.replace('comments-', '');
+            loadComments(blogId);
+        });
+
     });
 
     // Загрузка комментариев для записи блога
