@@ -554,11 +554,10 @@
             return response.text();
         })
         .then(html => {
-            // Вставляем полученный HTML с комментарием в список
-            const commentsList = document.getElementById('comments-list-' + blogId);
-            if (commentsList) {
-                commentsList.insertAdjacentHTML('beforeend', html);
-            }
+            // Вместо добавления HTML вручную, полностью перезагружаем список комментариев
+            // Это гарантирует, что надпись "Комментариев пока нет" исчезнет
+            const blogId = document.getElementById('commentBlogId').value;
+            loadComments(blogId);
 
             // Закрываем модальное окно
             closeCommentModal();
@@ -597,9 +596,9 @@
         })
         .then(html => {
             const commentsList = document.getElementById('comments-list-' + blogId);
-            if (commentsList) {
-                commentsList.innerHTML = html || '<p style="color:#888;font-style:italic;">Комментариев пока нет</p>';
-            }
+                // Проверяем, есть ли реальный контент (после удаления пробелов)
+                const trimmedHtml = html.trim();
+                commentsList.innerHTML = trimmedHtml ? trimmedHtml : '<p style="color:#888;font-style:italic;">Комментариев пока нет</p>';
         })
         .catch(error => {
             console.error('Ошибка загрузки комментариев:', error);
