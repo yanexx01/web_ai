@@ -55,6 +55,8 @@ Route::middleware(['log.visit'])->group(function () {
     // Добавление комментария только для авторизованных
     Route::middleware(['auth'])->group(function () {
         Route::post('/comments', [CommentController::class, 'store']);
+        Route::put('/comments/{id}', [CommentController::class, 'update']);
+        Route::delete('/comments/{id}', [CommentController::class, 'destroy']);
     });
 
     // Маршруты аутентификации

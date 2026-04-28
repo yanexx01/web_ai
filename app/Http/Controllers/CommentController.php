@@ -75,4 +75,72 @@ class CommentController extends Controller
         return response($html, 200)
             ->header('Content-Type', 'text/html');
     }
+/**
+     * Обновление комментария (только автор может редактировать свой комментарий)
+     */
+    public function update(Request $request, $id)
+    {
+        if (!Auth::check()) {
+            return response()->json(['message' => 'Требуется авторизация'], 401);
+        }
+
+        $validator = $request->validate([
+            'content' => 'required|string|min:1|max:1000',
+        ], [
+            'content.required' => 'Введите текст комментария',
+            'content.min' => 'Комментарий должен содержать хотя бы 1 символ',
+            'content.max' => 'Комментарий не должен превышать 1000 символов',
+        ]);
+
+        $comment = Comment::find($id);
+
+        if (!$comment) {
+            return response()->json(['message' => 'Комментарий не найден'], 404);
+        }
+
+        // Проверка: только автор может редактировать свой комментарий
+        if ($comment->user_id !== Auth::id()) {
+            return response()->json(['message' => 'У вас нет прав для редактирования этого комментария'], 403);
+        }
+
+        $comment->content = $request->input('content');
+        $comment->save();
+
+        $comment->load('user');
+        $commentDate = \Carbon\Carbon::parse($comment->created_at)->format('d.m.Y H:i');
+
+        $html = view('blog._comment_single', [
+            'comment' => $comment,
+            'commentDate' => $commentDate
+        ])->render();
+
+        return response($html, 200)
+            ->header('Content-Type', 'text/html');
+    }
+
+    /**
+     * Удаление комментария (только автор может удалить свой комментарий)
+     */
+    public function destroy($id)
+    {
+        if (!Auth::check()) {
+            return response('Unauthorized', 401);
+        }
+
+        $comment = Comment::find($id);
+
+        if (!$comment) {
+            return response('Comment not found', 404);
+        }
+
+        // Проверка: только автор может удалить свой комментарий
+        if ($comment->user_id !== Auth::id()) {
+            return response('Forbidden', 403);
+        }
+
+        $blogId = $comment->blog_id;
+        $comment->delete();
+
+        return response('Deleted', 200);
+    }
 }

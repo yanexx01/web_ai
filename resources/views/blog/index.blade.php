@@ -137,7 +137,7 @@
     <div class="modal-container comment-modal-container" onclick="event.stopPropagation()">
         <div class="modal-header">
             <h3>Добавить комментарий</h3>
-            <button class="modal-close-btn" onclick="closeCommentModal(event)">&times;</button>
+            <button class="modal-close-btn" type="button" onclick="closeCommentModal()">&times;</button>
         </div>
         <div class="modal-body comment-modal-body">
             <form id="commentForm" onsubmit="submitComment(event)">
@@ -425,6 +425,43 @@
         text-decoration: underline;
     }
 
+    /* Кнопки действий для комментариев */
+    .comment-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid #e0e0e0;
+    }
+
+    .btn-comment-edit,
+    .btn-comment-delete {
+        padding: 5px 12px;
+        font-size: 0.85rem;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .btn-comment-edit {
+        background: #ffc107;
+        color: #333;
+    }
+
+    .btn-comment-edit:hover {
+        background: #ffca2c;
+    }
+
+    .btn-comment-delete {
+        background: #dc3545;
+        color: white;
+    }
+
+    .btn-comment-delete:hover {
+        background: #bb2d3b;
+    }
+
 
     @media (max-width: 600px) {
         .modal-container {
@@ -462,6 +499,7 @@
 
     function closeBlogModal() {
         const modal = document.getElementById('blogImageModal');
+
         
         // Убираем класс прозрачности
         modal.classList.remove('show');
@@ -507,6 +545,12 @@
 
         const modal = document.getElementById('commentModal');
         modal.classList.remove('show');
+        const titleEl = modal.querySelector('h3');
+
+        // Сбрасываем заголовок и состояние редактирования при закрытии
+        titleEl.textContent = 'Добавить комментарий';
+        editingCommentId = null;
+
 
         setTimeout(() => {
             modal.style.display = 'none';
@@ -604,5 +648,146 @@
             console.error('Ошибка загрузки комментариев:', error);
         });
     }
+    
+    // Модальное окно для редактирования комментария
+    let editingCommentId = null;
+
+    function editComment(commentId, content) {
+        editingCommentId = commentId;
+
+        const modal = document.getElementById('commentModal');
+        const titleEl = modal.querySelector('h3');
+        const blogIdInput = document.getElementById('commentBlogId');
+        const contentInput = document.getElementById('commentContent');
+        const errorEl = document.getElementById('commentError');
+
+        // Меняем заголовок модального окна
+        titleEl.textContent = 'Редактировать комментарий';
+
+        // Устанавливаем текущий текст комментария
+        contentInput.value = content;
+        errorEl.textContent = '';
+
+        // Показываем модалку
+        modal.style.display = 'flex';
+        setTimeout(() => {
+            modal.classList.add('show');
+        }, 10);
+
+        document.body.style.overflow = 'hidden';
+    }
+
+    function deleteComment(commentId) {
+        if (!confirm('Вы уверены, что хотите удалить этот комментарий?')) {
+            return;
+        }
+
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+
+        fetch('/comments/' + commentId, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'text/html'
+            }
+        })
+        .then(response => {
+            if (response.status === 401) {
+                throw new Error('Требуется авторизация');
+            }
+            if (response.status === 403) {
+                throw new Error('У вас нет прав для удаления этого комментария');
+            }
+            if (!response.ok) {
+                return response.text().then(text => { throw new Error(text || 'Ошибка удаления'); });
+            }
+            return response.text();
+        })
+        .then(() => {
+            // Находим blog_id из родительского элемента и перезагружаем комментарии
+            const commentElement = document.getElementById('comment-' + commentId);
+            if (commentElement) {
+                const commentsSection = commentElement.closest('.comments-section');
+                if (commentsSection) {
+                    const blogId = commentsSection.id.replace('comments-', '');
+                    loadComments(blogId);
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+            alert(error.message || 'Ошибка при удалении комментария');
+        });
+    }
+
+    // Переопределяем функцию отправки для поддержки редактирования
+    const originalSubmitComment = submitComment;
+    submitComment = function(event) {
+        event.preventDefault();
+
+        const blogId = document.getElementById('commentBlogId').value;
+        const content = document.getElementById('commentContent').value.trim();
+        const errorEl = document.getElementById('commentError');
+
+        if (!content) {
+            errorEl.textContent = 'Введите текст комментария';
+            return;
+        }
+
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+
+        // Если мы редактируем комментарий
+        if (editingCommentId !== null) {
+            fetch('/comments/' + editingCommentId, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'text/html'
+                },
+                body: JSON.stringify({
+                    content: content
+                })
+            })
+            .then(response => {
+                if (response.status === 401) {
+                    throw new Error('Требуется авторизация');
+                }
+                if (response.status === 403) {
+                    throw new Error('У вас нет прав для редактирования этого комментария');
+                }
+                if (!response.ok) {
+                    return response.text().then(text => { throw new Error(text || 'Ошибка обновления'); });
+                }
+                return response.text();
+            })
+            .then(() => {
+                // Перезагружаем список комментариев
+                loadComments(blogId);
+
+                // Закрываем модальное окно
+                closeCommentModal();
+
+                // Очищаем состояние редактирования
+                editingCommentId = null;
+
+                // Сбрасываем заголовок модального окна
+                const modal = document.getElementById('commentModal');
+                const titleEl = modal.querySelector('h3');
+                titleEl.textContent = 'Добавить комментарий';
+
+                // Очищаем поле ввода
+                document.getElementById('commentContent').value = '';
+                errorEl.textContent = '';
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                errorEl.textContent = error.message || 'Ошибка при обновлении комментария';
+            });
+        } else {
+            // Обычная отправка нового комментария
+            originalSubmitComment(event);
+        }
+    };
 </script>
 @endsection
