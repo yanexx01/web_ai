@@ -19,6 +19,7 @@ class TestResult extends Model
      * Атрибуты, которые можно массово назначать
      */
     protected $fillable = [
+        'user_id',
         'fio',
         'user_group',
         'answers',
@@ -37,6 +38,7 @@ class TestResult extends Model
      * Поля модели (для документации)
      * 
      * @var int|null $id ID записи
+     * @var int|null $user_id ID пользователя (связь с таблицей users)
      * @var string $fio ФИО студента
      * @var string $user_group Учебная группа
      * @var array|string $answers Ответы на вопросы (JSON или массив)
@@ -58,5 +60,15 @@ class TestResult extends Model
             return is_array($decoded) ? $decoded : [];
         }
         return is_array($this->answers) ? $this->answers : [];
+    }
+    
+    /**
+     * Связь с пользователем.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }
