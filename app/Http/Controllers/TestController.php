@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Question;
 use App\Models\Answer;
-use App\models\TestResult;
+use App\Models\TestResult;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -84,6 +84,7 @@ class TestController extends Controller
 
                 // Сохраняем результат в БД
                 $testResult = new TestResult();
+                $testResult->user_id = auth()->id();
                 $testResult->fio = $request->input('fio');
                 $testResult->user_group = $request->input('user_group');
                 
@@ -121,8 +122,8 @@ class TestController extends Controller
             }
         }
 
-        // Получаем все результаты тестов из БД
-        $results = TestResult::orderBy('created_at', 'desc')->get();
+        // Получаем только результаты текущего пользователя
+        $results = auth()->user()->testResults()->orderBy('created_at', 'desc')->get();
 
         return view('test.index', [
             'title' => 'Тест по БЖД',

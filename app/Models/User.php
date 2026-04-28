@@ -30,4 +30,14 @@ class User extends Authenticatable
             'is_admin' => 'boolean',
         ];
     }
+    
+    /**
+     * Связь с результатами тестов.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function testResults()
+    {
+        return $this->hasMany(TestResult::class);
+    }
 }
