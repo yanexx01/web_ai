@@ -217,4 +217,133 @@ class BlogController extends Controller
         return redirect('/admin/blog')
             ->with('success', "Успешно загружено записей: {$successCount}");
     }
+
+    /**
+     * Отображение формы редактирования записи блога
+     */
+    public function edit($id)
+    {
+        $blog = Blog::findOrFail($id);
+
+        return view('admin.blog.edit', [
+            'pageTitle' => 'Редактирование записи',
+            'pageName' => 'admin-blog',
+            'blog' => $blog
+        ]);
+    }
+
+    /**
+     * Обработка формы обновления записи блога
+     */
+    public function update(Request $request, $id)
+    {
+        $blog = Blog::findOrFail($id);
+
+        // Валидация данных
+        try {
+            $validator = $request->validate([
+                'topic' => 'required|string|max:255',
+                'image' => 'nullable|file|mimes:jpg,jpeg,png,gif,webp|max:10240',
+                'message' => 'required|string',
+            ], [
+                'image.max' => 'Размер изображения не должен превышать 10MB. Пожалуйста, выберите изображение меньшего размера.',
+                'image.mimes' => 'Неверный формат изображения. Допустимые форматы: jpg, jpeg, png, gif, webp.',
+                'image.file' => 'Файл изображения поврежден или не может быть загружен.',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->view('admin.blog.iframe-response', [
+                'jsonResponse' => [
+                    'success' => false,
+                    'errors' => $e->errors()
+                ],
+                'responseType' => 'blog-edit-response'
+            ])->header('Content-Type', 'text/html');
+        }
+
+        // Обновляем данные
+        $blog->topic = $request->input('topic');
+        $blog->message = $request->input('message');
+
+        // Если пользователь хочет удалить изображение
+        if ($request->input('remove_photo') == '1') {
+            if ($blog->image) {
+                $oldImagePath = storage_path('app/public/' . $blog->image);
+                if (file_exists($oldImagePath)) {
+                    unlink($oldImagePath);
+                }
+            }
+            $blog->image = null;
+        }
+
+        // Обработка загрузки нового изображения (только если не было удалено)
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+
+            if (!$image->isValid()) {
+                return response()->view('admin.blog.iframe-response', [
+                    'jsonResponse' => [
+                        'success' => false,
+                        'errors' => ['image' => ['Ошибка при загрузке файла. Попробуйте еще раз.']]
+                    ],
+                    'responseType' => 'blog-edit-response'
+                ])->header('Content-Type', 'text/html');
+            }
+
+            // Удаляем старое изображение, если оно существует и не было удалено выше
+            if ($blog->image) {
+                $oldImagePath = storage_path('app/public/' . $blog->image);
+                if (file_exists($oldImagePath)) {
+                    unlink($oldImagePath);
+                }
+            }
+
+            // Генерируем уникальное имя файла
+            $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+
+            try {
+                $imagePath = $image->storeAs('blog_images', $imageName, 'public');
+                $blog->image = $imagePath;
+            } catch (\Exception $e) {
+                return response()->view('admin.blog.iframe-response', [
+                    'jsonResponse' => [
+                        'success' => false,
+                        'errors' => ['image' => ['Не удалось сохранить изображение: ' . $e->getMessage()]]
+                    ],
+                    'responseType' => 'blog-edit-response'
+                ])->header('Content-Type', 'text/html');
+            }
+        }
+
+        $blog->save();
+
+        // Возвращаем HTML ответ для iFrame с пост-сообщением родительскому окну
+        return response()->view('admin.blog.iframe-response', [
+            'jsonResponse' => [
+                'success' => true,
+                'id' => $blog->id,
+                'topic' => $blog->topic,
+                'message' => $blog->message,
+                'image' => $blog->image
+            ],
+            'responseType' => 'blog-edit-response'
+        ])->header('Content-Type', 'text/html');
+    }
+
+    /**
+     * Удаление записи блога
+     */
+    public function destroy($id)
+    {
+        $blog = Blog::findOrFail($id);
+
+        // Удаляем изображение, если оно существует
+        if ($blog->image && file_exists(storage_path('app/public/' . $blog->image))) {
+            unlink(storage_path('app/public/' . $blog->image));
+        }
+
+        $blog->delete();
+
+        return redirect('/admin/blog')->with('success', 'Запись успешно удалена!');
+    }
+
 }

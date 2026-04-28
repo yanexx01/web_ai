@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\BlogController as AdminBlogController;
 use App\Http\Controllers\Admin\GuestbookController as AdminGuestbookController;
 use App\Http\Controllers\Admin\StatsController;
+use App\Http\Controllers\CommentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,9 +50,18 @@ Route::middleware(['log.visit'])->group(function () {
     Route::get('/blog/upload', [BlogController::class, 'showUploadForm'])->name('blog.upload.form');
     Route::post('/blog/upload', [BlogController::class, 'uploadCsv'])->name('blog.upload');
 
+    Route::get('/blog/{blogId}/comments', [CommentController::class, 'index']);
+
+    // Добавление комментария только для авторизованных
+    Route::middleware(['auth'])->group(function () {
+        Route::post('/comments', [CommentController::class, 'store']);
+    });
+
     // Маршруты аутентификации
     Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
+
+    Route::post('/check-login', [AuthController::class, 'checkLogin'])->name('check.login');
 
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
@@ -79,6 +89,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/blog/store', [AdminBlogController::class, 'store'])->name('blog.store');
         Route::get('/blog/upload', [AdminBlogController::class, 'showUploadForm'])->name('blog.upload.form');
         Route::post('/blog/upload', [AdminBlogController::class, 'uploadCsv'])->name('blog.upload');
+        // Редактирование записей блога (iFrame + JSON)
+        Route::get('/blog/{id}/edit', [AdminBlogController::class, 'edit'])->name('blog.edit');
+        Route::put('/blog/{id}', [AdminBlogController::class, 'update'])->name('blog.update');
+        Route::delete('/blog/{id}', [AdminBlogController::class, 'destroy'])->name('blog.destroy');
 
         // Гостевая книга
         Route::get('/guestbook', [AdminGuestbookController::class, 'index'])->name('guestbook.index');

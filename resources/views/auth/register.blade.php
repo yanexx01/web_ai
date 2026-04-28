@@ -29,7 +29,8 @@
 
         <div class="form-group">
             <label for="login">Логин</label>
-            <input type="text" id="login" name="login" value="{{ old('login') }}" required>
+            <input type="text" id="login" name="login" value="{{ old('login') }}" required onBlur="checkLogin()">
+            <span id="login-status"></span>
         </div>
 
         <div class="form-group">
@@ -146,5 +147,70 @@
 .auth-link a:hover {
     text-decoration: underline;
 }
+
+#login-status {
+    display: block;
+    margin-top: 5px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+#login-status.occupied {
+    color: #c00;
+}
+
+#login-status.free {
+    color: #0a0;
+}
+
+#login-status.checking {
+    color: #999;
+}
 </style>
+
+<script>
+function checkLogin() {
+    var loginInput = document.getElementById('login');
+    var statusSpan = document.getElementById('login-status');
+    var loginValue = loginInput.value.trim();
+
+    if (loginValue === '') {
+        statusSpan.className = '';
+        statusSpan.textContent = '';
+        return;
+    }
+
+    statusSpan.className = 'checking';
+    statusSpan.textContent = 'Проверка...';
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '{{ route('check.login') }}', true);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    xhr.setRequestHeader('X-CSRF-TOKEN', '{{ csrf_token() }}');
+
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                var response = xhr.responseText;
+                if (response === 'occupied') {
+                    statusSpan.className = 'occupied';
+                    statusSpan.textContent = 'Пользователь с таким логином уже существует';
+                } else if (response === 'free') {
+                    statusSpan.className = 'free';
+                    statusSpan.textContent = 'Логин свободен';
+                } else {
+                    statusSpan.className = '';
+                    statusSpan.textContent = '';
+                }
+            } else {
+                statusSpan.className = '';
+                statusSpan.textContent = 'Ошибка проверки';
+            }
+        }
+    };
+
+    xhr.send('login=' + encodeURIComponent(loginValue));
+}
+</script>
+
 @endsection

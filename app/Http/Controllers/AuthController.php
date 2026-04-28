@@ -19,6 +19,24 @@ class AuthController extends Controller
     }
 
     /**
+     * Проверка занятости логина (AJAX, plaintext).
+     * Возвращает строку: 'occupied' или 'free'.
+     */
+    public function checkLogin(Request $request)
+    {
+        $login = trim($request->input('login', ''));
+
+        if (empty($login)) {
+            return response('invalid', 400)->header('Content-Type', 'text/plain');
+        }
+
+        $exists = User::where('login', $login)->exists();
+
+        return response($exists ? 'occupied' : 'free')
+            ->header('Content-Type', 'text/plain');
+    }
+
+    /**
      * Обработать регистрацию пользователя.
      */
     public function register(Request $request)

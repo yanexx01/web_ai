@@ -4,6 +4,7 @@
     <meta charset="utf-8"/>
     <meta name="author" content="Lucky"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $pageTitle ?? 'Личный сайт' }}</title>
     
     <link rel="stylesheet" href="/css/style.css"/>
@@ -31,12 +32,27 @@
     <button id="menu-toggle" class="menu-toggle-btn">☰</button>
     <div id="clock" class="clock-display"></div>
     
+    <!-- Отображение информации о пользователе и кнопок авторизации -->
+    <div class="header-user-section">
+        @auth
+            <span class="user-name">{{ Auth::user()->name }}</span>
+            <form method="POST" action="{{ route('logout') }}" style="display: inline;">
+                @csrf
+                <button type="submit" class="btn-header logout-btn">Выйти</button>
+            </form>
+        @else
+            <a href="{{ route('login') }}" class="btn-header">Войти</a>
+            <a href="{{ route('register') }}" class="btn-header">Зарегистрироваться</a>
+        @endauth
+    </div>
+
+    
     <!-- Отображение информации о пользователе -->
-    @auth
+    {{-- @auth
         <div class="user-info">
             {{ Auth::user()->name }}: {{ Auth::user()->login }}
         </div>
-    @endauth
+    @endauth --}}
 </header>
 
 <!-- Боковое меню -->
@@ -53,7 +69,7 @@
         <li><a href="/blog" class="menu-item" data-page="blog">Блог</a></li>
         
         <!-- Ссылки авторизации -->
-        @guest
+        {{-- @guest
             <li><a href="{{ route('login') }}" class="menu-item" data-page="login">Войти</a></li>
             <li><a href="{{ route('register') }}" class="menu-item" data-page="register">Регистрация</a></li>
         @else
@@ -63,7 +79,7 @@
                     <button type="submit" class="menu-item logout-btn">Выйти</button>
                 </form>
             </li>
-        @endguest
+        @endguest --}}
     </ul>
 </nav>
 

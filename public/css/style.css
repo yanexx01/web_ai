@@ -1073,12 +1073,33 @@ html {
     scroll-behavior: smooth;
 }
 /* === СТИЛИ ДЛЯ АВТОРИЗАЦИИ === */
-.user-info {
-    color: #fff;
-    font-size: 14px;
-    padding: 0 15px;
+.header-user-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-right: auto;
+    margin-left: 15px;
 }
 
+.user-name {
+    color: #fff;
+    font-size: 14px;
+    padding: 8px 12px;
+}
+
+.btn-header {
+    color: #fff;
+    text-decoration: none;
+    font-size: 14px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    transition: background 0.3s;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.btn-header:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
 .logout-btn {
     background: none;
     border: none;
