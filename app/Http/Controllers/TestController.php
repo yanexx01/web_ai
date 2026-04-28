@@ -84,7 +84,7 @@ class TestController extends Controller
 
                 // Сохраняем результат в БД
                 $testResult = new TestResult();
-                $testResult->user_id = Auth::id;
+                $testResult->user_id = auth()->id();
                 $testResult->fio = $request->input('fio');
                 $testResult->user_group = $request->input('user_group');
                 
