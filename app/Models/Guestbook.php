@@ -31,7 +31,12 @@ class Guestbook extends Model
      * Отключаем автоматическое обновление updated_at
      */
     public $timestamps = false;
-
+    /**
+     * Преобразование типов атрибутов
+     */
+    protected $casts = [
+        'created_at' => 'datetime',
+    ];
     /**
      * Поля модели (для документации)
      * 
