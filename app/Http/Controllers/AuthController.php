@@ -85,6 +85,12 @@ class AuthController extends Controller
             Auth::login($user, $request->boolean('remember'));
             $request->session()->regenerate();
 
+            // Проверяем, есть ли параметр redirect_to и не ведет ли он на страницу логина/регистрации
+            $redirectTo = $request->input('redirect_to');
+            if ($redirectTo && !in_array(parse_url($redirectTo, PHP_URL_PATH), ['/login', '/register', ''])) {
+                return redirect($redirectTo)->with('success', 'Вы успешно вошли!');
+            }
+
             return redirect()->intended('/')->with('success', 'Вы успешно вошли!');
         }
 
