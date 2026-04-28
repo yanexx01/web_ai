@@ -84,7 +84,7 @@ class TestController extends Controller
 
                 // Сохраняем результат в БД
                 $testResult = new TestResult();
-                $testResult->user_id = auth()->id();
+                $testResult->user_id = Auth::id;
                 $testResult->fio = $request->input('fio');
                 $testResult->user_group = $request->input('user_group');
                 
@@ -123,7 +123,7 @@ class TestController extends Controller
         }
 
         // Получаем только результаты текущего пользователя
-        $results = auth()->user()->testResults()->orderBy('created_at', 'desc')->get();
+        $results = auth()->check() ? auth()->user()->testResults()->orderBy('created_at', 'desc')->get() : collect();
 
         return view('test.index', [
             'title' => 'Тест по БЖД',
@@ -132,7 +132,8 @@ class TestController extends Controller
             'oldInput' => $oldInput,
             'results' => $results,
             'questions' => $questions,
-            'correctAnswer' => $correctAnswer ?? []
+            'correctAnswer' => $correctAnswer ?? [],
+            'canTakeTest' => auth()->check()
         ]);
     }
 }
