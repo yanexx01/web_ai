@@ -22,6 +22,7 @@
 
     <form method="POST" action="{{ route('login') }}" class="auth-form">
         @csrf
+        <input type="hidden" name="redirect_to" value="{{ url()->previous() }}">
 
         <div class="form-group">
             <label for="login">Логин</label>
